@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Degree {
+  id        String    @id @default(cuid())
+  name      String    @unique // "Párvulo", "Prejardín", etc.
+  subjects  Subject[] // Subjects specific to this degree
+  students  Student[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Subject {
+  id            String         @id @default(cuid())
+  name          String // "Comunicativa", "Cognitiva", etc.
+  degrees       Degree[] // Many-to-many with degrees
+  studentGrades StudentGrade[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([name])
+}
+
+model Student {
+  id           String               @id @default(cuid())
+  name         String
+  degreeId     String
+  degree       Degree               @relation(fields: [degreeId], references: [id])
+  grades       StudentGrade[]
+  observations StudentObservation[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model Period {
+  id           String               @id @default(cuid())
+  number       Int // 1, 2, 3, 4
+  year         Int
+  observations StudentObservation[]
+  grades       StudentGrade[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  @@unique([number, year])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String?
+  role      String // "ADMIN", "TEACHER"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Student grades for each subject and period
+model StudentGrade {
+  id           String   @id @default(cuid())
+  grade        Float    // The actual grade value as a number between 1.0 and 5.0
+  achievements String? // The "Logros" or achievements for this grade
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id])
+  subjectId    String
+  subject      Subject  @relation(fields: [subjectId], references: [id])
+  periodId     String
+  period       Period   @relation(fields: [periodId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([studentId, subjectId, periodId])
+}
+
+// General observations for students by period, independent of subjects
+model StudentObservation {
+  id        String   @id @default(cuid())
+  content   String
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  periodId  String
+  period    Period   @relation(fields: [periodId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, periodId])
+}
