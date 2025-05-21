@@ -23,6 +23,9 @@ import { Degree } from "@prisma/client";
 import { Download, Printer } from "lucide-react";
 import StudentReportCard from "./StudentReportCard";
 import StudentReportDetail from "./StudentReportDetail";
+import BoletinPrint from "./BoletinPrint";
+import { useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 
 // Type definitions
 export type SubjectData = {
@@ -58,107 +61,130 @@ export default function ReportsTable({
   selectedYear,
   studentReports,
 }: ReportsTableProps) {
+  const boletinPrintRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef: boletinPrintRef });
+  const [selectedReportForPrint, setSelectedReportForPrint] =
+    useState<FormattedStudentReport | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
+    null
+  );
+
   const degreeName = degrees.find((d) => d.id === selectedDegree)?.name;
 
   const handlePrintReport = () => {
-    window.print();
+    reactToPrintFn();
   };
 
-  const handleDownloadReport = () => {
-    alert("Reporte descargado exitosamente");
-  };
-
-  const renderStudentReport = (studentId: string) => {
+  const handleViewReport = (studentId: string) => {
     const reportData = studentReports.find(
       (report) => report.student.id === studentId
     );
-    if (!reportData) return null;
-
-    const formattedReport = formatStudentReport(reportData, degrees);
-    return <StudentReportDetail report={formattedReport} />;
+    if (reportData) {
+      const formattedReport = formatStudentReport(reportData, degrees);
+      setSelectedReportForPrint(formattedReport);
+      setSelectedStudentId(studentId);
+    }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          Estudiantes: {degreeName} - Año {selectedYear}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {studentReports.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Periodos Registrados</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {studentReports.map((report) => {
-                const periodText = report.periodGrades
-                  .map((p) => `Periodo ${p.periodNumber}`)
-                  .join(", ");
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Estudiantes: {degreeName} - Año {selectedYear}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {studentReports.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Periodos Registrados</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {studentReports.map((report) => {
+                  const periodText = report.periodGrades
+                    .map((p) => `Periodo ${p.periodNumber}`)
+                    .join(", ");
 
-                return (
-                  <TableRow key={report.student.id}>
-                    <TableCell>
-                      <StudentReportCard student={report.student} />
-                    </TableCell>
-                    <TableCell>{periodText}</TableCell>
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            Ver Boletín
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Boletín de {report.student.name} - {selectedYear}
-                            </DialogTitle>
-                          </DialogHeader>
-                          <ScrollArea className="max-h-[80vh]">
-                            {renderStudentReport(report.student.id)}
-                          </ScrollArea>
-                          <DialogFooter>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handlePrintReport}
-                              className="gap-2"
-                            >
-                              <Printer className="h-4 w-4" />
-                              Imprimir
+                  return (
+                    <TableRow key={report.student.id}>
+                      <TableCell>
+                        <StudentReportCard student={report.student} />
+                      </TableCell>
+                      <TableCell>{periodText}</TableCell>
+                      <TableCell>
+                        <Dialog
+                          onOpenChange={(open) => {
+                            if (open) {
+                              handleViewReport(report.student.id);
+                            }
+                          }}
+                        >
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              Ver Boletín
                             </Button>
-                            <Button
-                              size="sm"
-                              onClick={handleDownloadReport}
-                              className="gap-2"
-                            >
-                              <Download className="h-4 w-4" />
-                              Descargar PDF
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              No hay información de calificaciones para los estudiantes en este
-              año.
-            </p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl">
+                            <DialogHeader>
+                              <DialogTitle>
+                                Boletín de {report.student.name} -{" "}
+                                {selectedYear}
+                              </DialogTitle>
+                            </DialogHeader>
+                            <ScrollArea className="max-h-[80vh]">
+                              {selectedStudentId === report.student.id &&
+                                selectedReportForPrint && (
+                                  <StudentReportDetail
+                                    report={selectedReportForPrint}
+                                  />
+                                )}
+                            </ScrollArea>
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handlePrintReport}
+                                className="gap-2"
+                              >
+                                <Printer className="h-4 w-4" />
+                                Imprimir
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => console.log("downloading...")}
+                                className="gap-2"
+                              >
+                                <Download className="h-4 w-4" />
+                                Descargar PDF
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">
+                No hay información de calificaciones para los estudiantes en
+                este año.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      <BoletinPrint
+        printRef={boletinPrintRef as React.RefObject<HTMLDivElement>}
+        report={selectedReportForPrint}
+      />
+    </>
   );
 }

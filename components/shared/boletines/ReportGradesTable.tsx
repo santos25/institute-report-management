@@ -36,12 +36,14 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
       <TableBody>
         {report.subjects.map((subject) => {
           const finalGrade = calculateFinalGrade(subject, report.periodNumbers);
+          console.log(subject.periods[report.lastPeriodNumber].achievements);
+
           return (
             <TableRow key={subject.id} className="border-b">
-              <TableCell className="border align-top p-2">
+              <TableCell className="border align-top p-2 w-full">
                 <div className="font-bold">{subject.name}</div>
                 {subject.periods[report.lastPeriodNumber]?.achievements && (
-                  <div className="text-xs pl-4 mt-1">
+                  <div className="text-xs pl-4 mt-1 whitespace-pre-wrap">
                     {subject.periods[report.lastPeriodNumber].achievements}
                   </div>
                 )}

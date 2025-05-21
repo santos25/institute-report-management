@@ -11,7 +11,7 @@ const ReportObservation: React.FC<ReportObservationProps> = ({
   return (
     <div className="mt-4">
       <div className="font-bold mb-1">OBSERVACIONES:</div>
-      <div className="border p-3 text-sm whitespace-pre-wrap">
+      <div className="underline p-3 text-sm whitespace-pre-wrap">
         {observation}
       </div>
     </div>

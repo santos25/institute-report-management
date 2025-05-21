@@ -117,6 +117,7 @@ export default function GradeEntryForm({
   };
 
   const handleAchievementsChange = (studentId: string, value: string) => {
+    console.log(value);
     setAchievements((prev) => ({ ...prev, [studentId]: value }));
   };
 
@@ -231,9 +232,9 @@ export default function GradeEntryForm({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[200px]">Estudiante</TableHead>
-                      <TableHead>Observación General</TableHead>
-                      <TableHead className="w-[120px]">
+                      <TableHead className="w-[60%]">Estudiante</TableHead>
+                      <TableHead className="w-[30%]">Observación General</TableHead>
+                      <TableHead className="w-[10%]">
                         Calificación (1.0 - 5.0) -{" "}
                         {subjects.find((s) => s.id === selectedSubject)?.name}
                       </TableHead>
@@ -244,7 +245,7 @@ export default function GradeEntryForm({
                       .filter((student) => student.degreeId === degree.id)
                       .map((student) => (
                         <TableRow key={student.id}>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium w-[60%]">
                             {student.name}
                             <Textarea
                               placeholder="Logros del estudiante para esta asignatura"
@@ -255,10 +256,10 @@ export default function GradeEntryForm({
                                   e.target.value
                                 )
                               }
-                              className="min-h-[120px] min-w-[500px]"
+                              className="min-h-[120px] min-w-[500px] whitespace-pre-wrap"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="w-[30%]">
                             <Textarea
                               placeholder="Observación general del estudiante"
                               value={observations[student.id] || ""}
@@ -268,10 +269,10 @@ export default function GradeEntryForm({
                                   e.target.value
                                 )
                               }
-                              className="min-h-[120px]"
+                              className="min-h-[120px] whitespace-pre-wrap"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="w-[10%]">
                             <Input
                               type="number"
                               step="0.1"
