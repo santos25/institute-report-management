@@ -17,6 +17,7 @@ type Subject = {
 type Student = {
   name: string;
   degree: string;
+  // identification: string;
 };
 
 type SeedData = {
@@ -195,6 +196,10 @@ const dataToSeed: SeedData = {
         name: "FERNANDA LIÑÁN ZAMBRANO",
         degree: "Párvulo",
       },
+      {
+        name: "MATIAS ALEJANDRO CABALLERO PRADA",
+        degree: "Párvulo",
+      },
     ],
     prejardin: [
       {
@@ -257,6 +262,10 @@ const dataToSeed: SeedData = {
         name: "MIA MORALES GALINDO",
         degree: "Prejardín",
       },
+      {
+        name: "ELIECER DAVID GUERRERO VILLANUEVA",
+        degree: "Prejardín",
+      },
     ],
     jardin: [
       {
@@ -311,8 +320,13 @@ const dataToSeed: SeedData = {
         name: "SALOME VEGA CABALLERO",
         degree: "Jardín",
       },
+
       {
         name: "MATEO DE JESÚS JARABA OSPINO",
+        degree: "Jardín",
+      },
+      {
+        name: "CARLOS DAVID CASSIANI NARVAEZ",
         degree: "Jardín",
       },
     ],
@@ -864,6 +878,7 @@ async function main() {
           await prisma.student.create({
             data: {
               name: student.name,
+              // identification: student.id,
               degree: {
                 connect: { id: createdDegree.id },
               },

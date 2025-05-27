@@ -6,6 +6,7 @@ import {
   FormattedStudentReport,
   SubjectData,
 } from "@/components/shared/boletines/ReportsTable";
+import { SUBJECT_HOURS_BY_GRADE } from "./constant";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -76,4 +77,14 @@ export const formatStudentReport = (
     subjects: Array.from(allSubjects.values()),
     observations,
   };
+};
+
+export const getHourBySubjectAndDegree = (
+  subjectName: string,
+  degreeName: string
+) => {
+  const subjectHours =
+    SUBJECT_HOURS_BY_GRADE[degreeName as keyof typeof SUBJECT_HOURS_BY_GRADE];
+  const subject = subjectHours.find((s) => s.name === subjectName);
+  return subject?.hours;
 };

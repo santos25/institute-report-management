@@ -56,11 +56,11 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "StudentGrade" (
     "id" TEXT NOT NULL,
-    "grade" TEXT NOT NULL,
+    "grade" DOUBLE PRECISION NOT NULL,
+    "achievements" TEXT,
     "studentId" TEXT NOT NULL,
     "subjectId" TEXT NOT NULL,
     "periodId" TEXT NOT NULL,
-    "teacherId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -73,7 +73,6 @@ CREATE TABLE "StudentObservation" (
     "content" TEXT NOT NULL,
     "studentId" TEXT NOT NULL,
     "periodId" TEXT NOT NULL,
-    "teacherId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -122,16 +121,10 @@ ALTER TABLE "StudentGrade" ADD CONSTRAINT "StudentGrade_subjectId_fkey" FOREIGN 
 ALTER TABLE "StudentGrade" ADD CONSTRAINT "StudentGrade_periodId_fkey" FOREIGN KEY ("periodId") REFERENCES "Period"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StudentGrade" ADD CONSTRAINT "StudentGrade_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "StudentObservation" ADD CONSTRAINT "StudentObservation_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "StudentObservation" ADD CONSTRAINT "StudentObservation_periodId_fkey" FOREIGN KEY ("periodId") REFERENCES "Period"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "StudentObservation" ADD CONSTRAINT "StudentObservation_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_DegreeToSubject" ADD CONSTRAINT "_DegreeToSubject_A_fkey" FOREIGN KEY ("A") REFERENCES "Degree"("id") ON DELETE CASCADE ON UPDATE CASCADE;

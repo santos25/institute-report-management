@@ -1,6 +1,5 @@
 import ReportGradesTable from "./ReportGradesTable";
 import ReportObservation from "./ReportObservation";
-import ReportSignatures from "./ReportSignatures";
 import { FormattedStudentReport } from "./ReportsTable";
 
 // Main student report component
@@ -16,8 +15,6 @@ const StudentReportDetail: React.FC<{
       <ReportObservation
         observation={report.observations[report.lastPeriodNumber]}
       />
-
-      <ReportSignatures />
     </div>
   );
 };

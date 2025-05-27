@@ -76,6 +76,8 @@ export default function ReportsTable({
   };
 
   const handleViewReport = (studentId: string) => {
+    console.log("studentReports: ", studentReports);
+
     const reportData = studentReports.find(
       (report) => report.student.id === studentId
     );
@@ -184,6 +186,7 @@ export default function ReportsTable({
       <BoletinPrint
         printRef={boletinPrintRef as React.RefObject<HTMLDivElement>}
         report={selectedReportForPrint}
+        year={selectedYear}
       />
     </>
   );

@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+
 import {
   Select,
   SelectContent,
@@ -44,6 +46,7 @@ export default function GradeEntryForm({
   const [achievements, setAchievements] = useState<Record<string, string>>({});
   const [observations, setObservations] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Handle subject change and fetch existing grades
   const handleSubjectChange = async (value: string) => {
@@ -126,6 +129,8 @@ export default function GradeEntryForm({
   };
 
   const handleSave = async () => {
+    setSaving(true);
+
     // Create an array of student IDs that belong to this degree
     const degreeStudentIds = students
       .filter((student) => student.degreeId === degree.id)
@@ -164,28 +169,33 @@ export default function GradeEntryForm({
       });
 
     if (gradesToSave.length === 0) {
-      alert("No hay calificaciones, logros o observaciones para guardar");
+      toast.error("No hay calificaciones, logros o observaciones para guardar");
+      setSaving(false);
       return;
     }
 
     try {
       const result = await saveGrades(gradesToSave);
       if (result.success) {
-        alert(`Datos guardados exitosamente`);
+        toast.success(`Datos guardados exitosamente`);
       } else {
         // TypeScript safeguarding for error property
         const errorMessage =
           "success" in result && "error" in result
             ? result.error
             : "Error desconocido";
-        alert(`Error al guardar: ${errorMessage}`);
+        toast.error(`Error al guardar: ${errorMessage}`);
       }
     } catch (error) {
       console.error(
         "Error saving grades, achievements, and observations:",
         error
       );
-      alert("Error al guardar las calificaciones, logros y observaciones");
+      toast.error(
+        "Error al guardar las calificaciones, logros y observaciones"
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -233,7 +243,9 @@ export default function GradeEntryForm({
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[60%]">Estudiante</TableHead>
-                      <TableHead className="w-[30%]">Observación General</TableHead>
+                      <TableHead className="w-[30%]">
+                        Observación General
+                      </TableHead>
                       <TableHead className="w-[10%]">
                         Calificación (1.0 - 5.0) -{" "}
                         {subjects.find((s) => s.id === selectedSubject)?.name}
@@ -294,8 +306,8 @@ export default function GradeEntryForm({
             )}
 
             <div className="mt-6 flex justify-end">
-              <Button onClick={handleSave} disabled={loading}>
-                Guardar Calificaciones
+              <Button onClick={handleSave} disabled={loading || saving}>
+                {saving ? "Cargando Datos..." : "Guardar Calificaciones"}
               </Button>
             </div>
           </CardContent>

@@ -3,7 +3,16 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "../../ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "../../ui/navigation-menu";
+import { ScrollText, SquarePen } from "lucide-react";
 
 // Navigation links data
 const NAV_ITEMS = [
@@ -12,13 +21,13 @@ const NAV_ITEMS = [
     href: "#",
     hasDropdown: true,
     dropdownItems: [
-      { label: "Planillas", href: "/planillas" },
-      { label: "Boletines", href: "/boletines" },
+      { label: "Planillas", href: "/planillas", icon: <SquarePen /> },
+      { label: "Boletines", href: "/boletines", icon: <ScrollText /> },
     ],
   },
-  { label: "Cursos", href: "/cursos" },
-  { label: "Programas", href: "/programas" },
-  { label: "Contactanos", href: "/contactanos" },
+  { label: "Cursos", href: "#" },
+  { label: "Programas", href: "#" },
+  { label: "Contáctanos", href: "#" },
 ];
 
 // Mobile menu item component
@@ -79,81 +88,17 @@ const MobileMenuItem = ({
   );
 };
 
-// Desktop menu item component
-const DesktopMenuItem = ({
-  item,
-  isOpen,
-  toggleDropdown,
-}: {
-  item: (typeof NAV_ITEMS)[0];
-  isOpen?: boolean;
-  toggleDropdown?: () => void;
-}) => {
-  if (item.hasDropdown) {
-    return (
-      <div className="relative group">
-        <button
-          onClick={toggleDropdown}
-          className="inline-flex items-center text-gray-700 hover:text-blue-600 px-2 py-2 rounded-md text-sm font-medium"
-        >
-          {item.label}
-          <svg
-            className="ml-1 h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-        <div
-          className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 ${
-            isOpen ? "block" : "hidden"
-          }`}
-        >
-          <div className="py-1">
-            {item.dropdownItems?.map((dropdownItem, index) => (
-              <Link
-                key={index}
-                href={dropdownItem.href}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                {dropdownItem.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <Link
-      href={item.href}
-      className="text-gray-700 hover:text-blue-600 px-2 py-2 rounded-md text-sm font-medium"
-    >
-      {item.label}
-    </Link>
-  );
-};
-
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isTeacherMenuOpen, setIsTeacherMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleTeacherMenu = () => setIsTeacherMenuOpen(!isTeacherMenuOpen);
 
   return (
     <header className="w-full bg-white fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-center items-center h-20">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 mr-10">
             <Link href="/">
               <Image
                 priority
@@ -161,32 +106,68 @@ export const Header = () => {
                 alt="Educate Logo"
                 width={120}
                 height={40}
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {NAV_ITEMS.map((item, index) => (
-              <DesktopMenuItem
-                key={index}
-                item={item}
-                isOpen={
-                  item.label === "Profesores" ? isTeacherMenuOpen : undefined
-                }
-                toggleDropdown={
-                  item.label === "Profesores" ? toggleTeacherMenu : undefined
-                }
-              />
-            ))}
-          </nav>
-
-          {/* Desktop Sign In/Sign Up buttons */}
-          <div className="hidden md:flex items-center space-x-3">
-            <Button variant="outline">Iniciar sesión</Button>
-            <Button>Registrarse</Button>
-          </div>
+          <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-gray-700 hover:text-blue-600">
+                  Profesores
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-4 w-[200px]">
+                    <NavigationMenuLink asChild>
+                      <Link
+                        href="/planillas"
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      >
+                        <div className="text-sm font-medium leading-none">
+                          Planillas
+                        </div>
+                        <SquarePen className="w-4 h-4" />
+                      </Link>
+                    </NavigationMenuLink>
+                    <NavigationMenuLink asChild>
+                      <Link
+                        href="/boletines"
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      >
+                        <div className="text-sm font-medium leading-none">
+                          Boletines
+                        </div>
+                        <ScrollText className="w-4 h-4" />
+                      </Link>
+                    </NavigationMenuLink>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="#" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Cursos
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="#" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Programas
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="#" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Contactanos
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
@@ -241,27 +222,10 @@ export const Header = () => {
             <MobileMenuItem
               key={index}
               item={item}
-              isOpen={
-                item.label === "Profesores" ? isTeacherMenuOpen : undefined
-              }
-              toggleDropdown={
-                item.label === "Profesores" ? toggleTeacherMenu : undefined
-              }
+              isOpen={isMenuOpen}
+              toggleDropdown={toggleMenu}
             />
           ))}
-        </div>
-        <div className="pt-4 pb-3 border-t border-gray-200">
-          <div className="flex items-center justify-center space-x-4 px-4">
-            <Button
-              variant="ghost"
-              className="w-full text-gray-700 hover:text-blue-600"
-            >
-              Iniciar sesión
-            </Button>
-            <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-black border-none">
-              Registrarse
-            </Button>
-          </div>
         </div>
       </div>
     </header>
