@@ -28,11 +28,11 @@ export default function Home() {
         <div className="relative z-10 flex items-center justify-center h-full">
           <div className="text-center text-white px-4 max-w-4xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Bienvenidos a Instituto Angelitos Alegres
+              Bienvenidos al Instituto Angelitos Alegres
             </h1>
             <p className="text-lg md:text-xl mb-8 leading-relaxed opacity-90">
-              Formando el futuro de nuestros niños con amor, dedicación y
-              excelencia educativa
+              Formando el futuro de nuestros niños y niñas con amor, dedicación
+              y excelencia educativa
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300">
@@ -69,15 +69,15 @@ export default function Home() {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                  Cursos
+                  Grados
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Descubre nuestros cursos diseñados para el desarrollo integral
-                  de los niños, con metodologías innovadoras.
+                  Descubre nuestros grados diseñados para el desarrollo integral
+                  de los niños y niñas, con metodologías innovadoras.
                 </p>
               </div>
               <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300">
-                Ver Cursos
+                Ver Grados
               </button>
             </div>
 

@@ -10,7 +10,7 @@ import ReportSelection from "@/components/shared/boletines/ReportSelection";
 import ReportsTable from "@/components/shared/boletines/ReportsTable";
 
 // Generate an array of recent years (current year and 5 previous years)
-const YEARS = Array.from({ length: 6 }, (_, i) => {
+const YEARS = Array.from({ length: 2 }, (_, i) => {
   const year = new Date().getFullYear() - i;
   return { id: year.toString(), year };
 });

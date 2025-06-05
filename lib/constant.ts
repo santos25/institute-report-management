@@ -1,4 +1,4 @@
-const PREESCOLAR_LEVEL = ["Párvulo", "Prejardín", "Jardín", "Transición"];
+const PREESCOLAR_LEVEL = ["Párvulo", "Pre jardín", "Jardín", "Transición"];
 
 const DOCENTES_BY_GRADE = {
   Párvulo: "KELLIS RIVERO RIVERO",
@@ -50,7 +50,7 @@ const primaria_subject = [
 
 const SUBJECT_HOURS_BY_GRADE = {
   Párvulo: preescolar_subject,
-  Prejardín: preescolar_subject,
+  "Pre Jardín": preescolar_subject,
   Jardín: preescolar_subject,
   Transición: transicion_subject,
   Primero: primaria_subject,

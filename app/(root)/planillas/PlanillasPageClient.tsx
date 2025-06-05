@@ -64,7 +64,7 @@ export default function PlanillasPageClient({
   const selectedPeriodObj = initialPeriods.find((p) => p.id === selectedPeriod);
 
   return (
-    <div className="max-w-5xl container mx-auto py-8 px-2">
+    <div className="max-w-6xl container mx-auto py-8 px-2">
       <h1 className="text-2xl font-bold mb-6">Registro de Calificaciones</h1>
 
       <GradeEntrySelection

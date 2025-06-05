@@ -88,3 +88,74 @@ export const getHourBySubjectAndDegree = (
   const subject = subjectHours.find((s) => s.name === subjectName);
   return subject?.hours;
 };
+
+// Function to calculate DS (Desempeño) based on grade
+export const calculateDS = (grade: string | number) => {
+  const numericGrade = typeof grade === "string" ? parseFloat(grade) : grade;
+
+  if (isNaN(numericGrade) || numericGrade === 0) {
+    return { label: "", variant: "secondary" as const, color: "" };
+  }
+
+  if (numericGrade >= 1.0 && numericGrade <= 2.9) {
+    return {
+      label: "BJ",
+      variant: "destructive" as const,
+      color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    };
+  } else if (numericGrade >= 3.0 && numericGrade <= 3.9) {
+    return {
+      label: "B",
+      variant: "secondary" as const,
+      color:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    };
+  } else if (numericGrade >= 4.0 && numericGrade <= 4.5) {
+    return {
+      label: "A",
+      variant: "default" as const,
+      color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    };
+  } else if (numericGrade >= 4.6 && numericGrade <= 5.0) {
+    return {
+      label: "S",
+      variant: "default" as const,
+      color:
+        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    };
+  }
+
+  return { label: "", variant: "secondary" as const, color: "" };
+};
+
+// Function to sort subjects in the specified order
+export const sortDegrees = (degrees: Degree[]) => {
+  const order = [
+    "Párvulo",
+    "Pre Jardín",
+    "Jardín",
+    "Transición",
+    "Primero",
+    "Segundo",
+    "Tercero",
+    "Cuarto",
+    "Quinto",
+  ];
+
+  return degrees.sort((a, b) => {
+    const indexA = order.indexOf(a.name);
+    const indexB = order.indexOf(b.name);
+
+    // If both subjects are in the order array, sort by their position
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB;
+    }
+
+    // If only one is in the order array, prioritize it
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+
+    // If neither is in the order array, sort alphabetically
+    return a.name.localeCompare(b.name);
+  });
+};

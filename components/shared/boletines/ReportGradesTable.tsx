@@ -31,7 +31,7 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
         <TableRow className="bg-gray-100">
           <TableHead className="border text-center w-full font-bold">
             {PREESCOLAR_LEVEL.includes(report?.degree?.name || "")
-              ? "DIMENSIÓNES"
+              ? "DIMENSIONES"
               : "ÁREAS (ASIGNATURAS)"}
           </TableHead>
           <TableHead className="border text-center font-bold">IH</TableHead>

@@ -116,7 +116,7 @@ export const Header = () => {
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="text-gray-700 hover:text-blue-600">
-                  Profesores
+                  Docentes
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid gap-3 p-4 w-[200px]">
@@ -148,7 +148,7 @@ export const Header = () => {
               <NavigationMenuItem>
                 <Link href="#" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Cursos
+                    Grados
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -162,7 +162,7 @@ export const Header = () => {
               <NavigationMenuItem>
                 <Link href="#" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Contactanos
+                    Contáctanos
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
