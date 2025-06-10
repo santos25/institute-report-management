@@ -41,7 +41,7 @@ const NAV_ITEMS = [
     label: "Galería",
     href: "#galeria",
     icon: <GraduationCap className="w-4 h-4" />,
-    description: "Proceso de inscripción",
+    description: "Momentos especiales",
   },
 ];
 
