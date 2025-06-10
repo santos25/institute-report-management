@@ -1,8 +1,8 @@
-const PREESCOLAR_LEVEL = ["Párvulo", "Pre jardín", "Jardín", "Transición"];
+const PREESCOLAR_LEVEL = ["Párvulo", "Pre Jardín", "Jardín", "Transición"];
 
 const DOCENTES_BY_GRADE = {
   Párvulo: "KELLIS RIVERO RIVERO",
-  Prejardín: "KELLIS RIVERO RIVERO",
+  "Pre Jardín": "KELLIS RIVERO RIVERO",
   Jardín: "DANNA MARTÍNEZ CASTELLÓN",
   Transición: "MERLY RUIZ LOZANO",
   Primero: "ENILSA VÉLEZ ALFARO",

@@ -6,7 +6,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Users, BookOpen, GraduationCap, Phone } from "lucide-react";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import {
+  Menu,
+  Users,
+  BookOpen,
+  GraduationCap,
+  Phone,
+  FileText,
+  Award,
+} from "lucide-react";
 
 const NAV_ITEMS = [
   {
@@ -141,17 +157,42 @@ export const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300"
-              asChild
-            >
-              <Link href="/planillas">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Portal Docentes
-              </Link>
-            </Button>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 bg-transparent border border-gray-300 hover:border-blue-300">
+                    <GraduationCap className="w-4 h-4 mr-2" />
+                    Portal Docentes
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[200px] gap-2 p-2">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href="/planillas"
+                            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                          >
+                            <FileText className="w-4 h-4" />
+                            Planillas
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href="/boletines"
+                            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                          >
+                            <Award className="w-4 h-4" />
+                            Boletines
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
             <Button
               size="sm"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -214,16 +255,31 @@ export const Header = () => {
 
                   {/* Mobile CTA */}
                   <div className="py-6 px-3 border-t border-gray-200 space-y-3">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start bg-white/50 border-gray-200 hover:bg-white"
-                      asChild
-                    >
-                      <Link href="/planillas">
-                        <GraduationCap className="w-4 h-4 mr-3" />
-                        Portal de Docentes
-                      </Link>
-                    </Button>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-600 px-3">
+                        Portal Docentes
+                      </p>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start bg-white/50 border-gray-200 hover:bg-white"
+                        asChild
+                      >
+                        <Link href="/planillas">
+                          <FileText className="w-4 h-4 mr-3" />
+                          Planillas
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start bg-white/50 border-gray-200 hover:bg-white"
+                        asChild
+                      >
+                        <Link href="/boletines">
+                          <Award className="w-4 h-4 mr-3" />
+                          Boletines
+                        </Link>
+                      </Button>
+                    </div>
                     <Button
                       className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
                       asChild
