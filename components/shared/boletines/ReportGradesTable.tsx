@@ -16,11 +16,11 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
   // Function to calculate average grade for a specific period
   const calculatePeriodAverage = (periodNumber: number) => {
     const validGrades = report.subjects
-      .map(subject => subject.periods[periodNumber]?.grade)
-      .filter(grade => grade !== undefined && grade !== null);
-    
+      .map((subject) => subject.periods[periodNumber]?.grade)
+      .filter((grade) => grade !== undefined && grade !== null);
+
     if (validGrades.length === 0) return 0;
-    
+
     const sum = validGrades.reduce((acc, grade) => acc + grade, 0);
     return sum / validGrades.length;
   };
@@ -52,7 +52,9 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
                 <div className="font-bold">{subject.name}</div>
                 {subject.periods[report.lastPeriodNumber]?.achievements && (
                   <div className="text-xs pl-4 mt-1 whitespace-pre-wrap">
-                    {subject.periods[report.lastPeriodNumber].achievements}
+                    {subject.periods[
+                      report.lastPeriodNumber
+                    ].achievements.trim()}
                   </div>
                 )}
               </TableCell>
@@ -77,14 +79,14 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
         })}
         {/* Average row */}
         <TableRow className="border-b bg-gray-50">
-          <TableCell className="border p-2 w-full font-bold text-right" colSpan={2}>
+          <TableCell
+            className="border p-2 w-full font-bold text-right"
+            colSpan={2}
+          >
             Promedio
           </TableCell>
           {report.periodNumbers.map((periodNum) => (
-            <TableCell
-              key={periodNum}
-              className="border text-center font-bold"
-            >
+            <TableCell key={periodNum} className="border text-center font-bold">
               {calculatePeriodAverage(periodNum).toFixed(1)}
             </TableCell>
           ))}

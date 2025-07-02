@@ -15,13 +15,11 @@ const BoletinPrint = ({
   report: FormattedStudentReport | null;
   year: string;
 }) => {
-  console.log("Report Data: ", report);
-
   return (
     <div ref={printRef} className="p-8 max-w-4xl mx-auto">
       <div className="p-4">
         {/* Header with Logo and Institution Info */}
-        <div className="flex justify-start">
+        <div className="flex justify-start relative">
           <div className="mr-10 ml-26">
             <Image
               priority
@@ -41,18 +39,9 @@ const BoletinPrint = ({
             </p>
             <p className="text-xs">Dane: 313001000185</p>
           </div>
-        </div>
 
-        {/* Report Title Section with Grading Scale */}
-        <div className="flex flex-col items-center mt-2 relative">
-          <div className="w-full text-center font-bold py-1 mb-4">
-            <h2 className="text-sm uppercase font-bold">
-              Informe Académico Periodo {report?.lastPeriodNumber}
-            </h2>
-          </div>
-
-          {/* Grading Scale Table - Absolute positioned to the right */}
-          <div className="absolute right-0 top-0">
+          {/* Grading Scale Table - Positioned to the right */}
+          <div className="absolute right-0 top-10">
             <table className="border border-gray-800 text-xs">
               <tbody>
                 <tr>
@@ -93,7 +82,7 @@ const BoletinPrint = ({
         </div>
 
         {/* Educational Level */}
-        <div className="text-center mt-4 mb-2">
+        <div className="text-center mt-10 mb-2">
           <h3 className="text-sm font-bold uppercase">
             Nivel{" "}
             {PREESCOLAR_LEVEL.includes(report?.degree?.name || "")
