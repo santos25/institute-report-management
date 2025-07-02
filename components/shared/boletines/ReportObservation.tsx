@@ -9,9 +9,9 @@ const ReportObservation: React.FC<ReportObservationProps> = ({
   if (!observation) return null;
 
   return (
-    <div className="mt-6">
-      <div className="font-bold">OBSERVACIONES:</div>
-      <div className="underline p-1 text-sm whitespace-pre-wrap">
+    <div className="mt-4">
+      <div className="font-bold mb-1 text-sm">OBSERVACIONES:</div>
+      <div className="underline p-1 text-xs whitespace-pre-wrap leading-tight">
         {observation}
       </div>
     </div>
