@@ -20,7 +20,7 @@ const BoletinPrint = ({
       <style>{`
         @media print {
           @page {
-            margin: 3.5rem 1.5rem 3.5rem 1.5rem;
+            margin: 2.5rem 1.5rem 2.5rem 1.5rem;
             background: white;
           }
           body {
@@ -29,8 +29,8 @@ const BoletinPrint = ({
           
           /* Hide browser print headers and footers */
           @page {
-            margin-top: 2.5rem;
-            margin-bottom: 2.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
             margin-left: 1.5rem;
             margin-right: 1.5rem;
           }
