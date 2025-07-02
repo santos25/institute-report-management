@@ -57,13 +57,13 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
               ? "DIMENSIONES"
               : "ÁREAS (ASIGNATURAS)"}
           </TableHead>
-          <TableHead className="border text-center font-bold text-sm py-1">
+          <TableHead className="border text-center font-bold text-xs py-1">
             IH
           </TableHead>
           {report.periodNumbers.map((periodNum) => (
             <TableHead
               key={periodNum}
-              className="border text-center font-bold text-sm py-1"
+              className="border text-center font-bold text-xs py-1"
             >
               PERIODO {periodNum}
               <br />
