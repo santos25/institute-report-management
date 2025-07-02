@@ -16,7 +16,32 @@ const BoletinPrint = ({
   year: string;
 }) => {
   return (
-    <div ref={printRef} className="p-6 max-w-4xl mx-auto">
+    <div ref={printRef} className="max-w-4xl mx-auto bg-white">
+      <style>{`
+        @media print {
+          @page {
+            margin: 2.5rem 1.5rem 2.5rem 1.5rem;
+            background: white;
+          }
+          body {
+            background: white !important;
+          }
+          
+          /* Hide browser print headers and footers */
+          @page {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            margin-left: 1.5rem;
+            margin-right: 1.5rem;
+          }
+          
+          /* Remove default browser print styling */
+          html, body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+        }
+      `}</style>
       <div className="p-4">
         {/* Header with Logo and Institution Info */}
         <div className="flex justify-start relative">
