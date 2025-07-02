@@ -5,7 +5,7 @@ import { TableBody, TableRow } from "@/components/ui/table";
 import { Table } from "@/components/ui/table";
 import { FormattedStudentReport } from "./ReportsTable";
 import { getHourBySubjectAndDegree } from "@/lib/utils";
-import { PREESCOLAR_LEVEL } from "@/lib/constant";
+import { PREESCOLAR_LEVEL, SUBJECT_HOURS_BY_GRADE } from "@/lib/constant";
 
 type ReportGradesTableProps = {
   report: FormattedStudentReport;
@@ -24,6 +24,29 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
     const sum = validGrades.reduce((acc, grade) => acc + grade, 0);
     return sum / validGrades.length;
   };
+
+  // Function to sort subjects according to the order in constants
+  const getSortedSubjects = () => {
+    const degreeName = report?.degree?.name || "";
+    const isPreescolar = PREESCOLAR_LEVEL.includes(degreeName);
+    
+    if (isPreescolar) {
+      // For preescolar, return subjects as they are
+      return report.subjects;
+    }
+    
+    // For primaria grades, sort according to primaria_subject order
+    const subjectOrder = SUBJECT_HOURS_BY_GRADE[degreeName as keyof typeof SUBJECT_HOURS_BY_GRADE] || [];
+    const orderMap = new Map(subjectOrder.map((subject, index) => [subject.name, index]));
+    
+    return [...report.subjects].sort((a, b) => {
+      const orderA = orderMap.get(a.name) ?? 999;
+      const orderB = orderMap.get(b.name) ?? 999;
+      return orderA - orderB;
+    });
+  };
+
+  const sortedSubjects = getSortedSubjects();
 
   return (
     <Table className="border">
@@ -50,7 +73,7 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {report.subjects.map((subject) => {
+        {sortedSubjects.map((subject) => {
           return (
             <TableRow key={subject.id} className="border-b">
               <TableCell className="border align-top p-1 w-full">
