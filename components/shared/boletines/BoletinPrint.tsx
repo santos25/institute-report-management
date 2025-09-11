@@ -107,7 +107,7 @@ const BoletinPrint = ({
         </div>
 
         {/* Educational Level */}
-        <div className="text-center mt-10 mb-2">
+        <div className="text-center mt-3 mb-2">
           <h3 className="text-sm font-bold uppercase">
             Nivel{" "}
             {PREESCOLAR_LEVEL.includes(report?.degree?.name || "")
