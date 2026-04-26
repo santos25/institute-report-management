@@ -87,6 +87,7 @@ export default function PlanillasPageClient({
           period={{
             id: selectedPeriodObj.id,
             number: selectedPeriodObj.number.toString(),
+            year: selectedPeriodObj.year,
           }}
           subjects={subjects}
           students={students}

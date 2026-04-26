@@ -31,6 +31,8 @@ export default function GradeEntrySelection({
   onSearch: () => void;
   loading: boolean;
 }) {
+  const planillaPeriods = periods.filter((p) => p.number >= 1 && p.number <= 3);
+
   return (
     <Card className="mb-6 border rounded-lg shadow-sm">
       <CardContent>
@@ -79,9 +81,9 @@ export default function GradeEntrySelection({
                 <SelectValue placeholder="Seleccionar Periodo" />
               </SelectTrigger>
               <SelectContent>
-                {periods.map((period) => (
+                {planillaPeriods.map((period) => (
                   <SelectItem key={period.id} value={period.id}>
-                    Periodo {period.number}
+                    Periodo {period.number} – {period.year}
                   </SelectItem>
                 ))}
               </SelectContent>

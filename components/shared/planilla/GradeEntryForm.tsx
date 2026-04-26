@@ -33,7 +33,7 @@ import { calculateDS } from "@/lib/utils";
 
 interface GradeEntryFormProps {
   degree: { id: string; name: string };
-  period: { id: string; number: string };
+  period: { id: string; number: string; year?: number };
   subjects: Subject[];
   students: Student[];
 }
@@ -207,9 +207,13 @@ export default function GradeEntryForm({
       <Card>
         <CardHeader className="pb-0">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex flex-wrap items-center gap-2">
               Calificaciones: <Badge className="text-sm">{degree.name}</Badge>
-              Periodo: <Badge className="text-sm">{period.number}</Badge>
+              Periodo:{" "}
+              <Badge className="text-sm">
+                {period.number}
+                {period.year != null ? ` – ${period.year}` : ""}
+              </Badge>
             </CardTitle>
 
             <div className="flex items-center gap-2">
