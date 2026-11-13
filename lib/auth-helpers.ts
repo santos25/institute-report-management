@@ -1,6 +1,22 @@
 import { auth } from "@/auth";
 
+export type AuthResult<T = unknown> =
+  | { ok: true; data: T }
+  | { ok: false; code: "UNAUTHENTICATED" | "FORBIDDEN"; message: string };
+
 export async function requireAuth() {
+  const session = await auth();
+  if (!session?.user) {
+    return {
+      ok: false,
+      code: "UNAUTHENTICATED",
+      message: "No session found",
+    } as const;
+  }
+  return { ok: true, data: session } as const;
+}
+
+export async function requireAuthOrThrow() {
   const session = await auth();
   if (!session?.user) {
     throw new Error("Unauthorized");
@@ -9,15 +25,25 @@ export async function requireAuth() {
 }
 
 export async function requireRole(allowedRoles: string[]) {
-  const session = await requireAuth();
-  if (!allowedRoles.includes(session.user.role)) {
-    throw new Error("Forbidden");
+  const result = await requireAuth();
+  if (!result.ok) {
+    return result;
   }
-  return session;
+  
+  const session = result.data;
+  if (!allowedRoles.includes(session.user.role)) {
+    return {
+      ok: false,
+      code: "FORBIDDEN",
+      message: "Insufficient permissions",
+    } as const;
+  }
+  return { ok: true, data: session } as const;
 }
 
 export async function canAccessDegree(degreeId: string) {
-  const session = await requireAuth();
+  const session = await auth();
+  if (!session?.user) return false;
   
   // ADMIN can access everything
   if (session.user.role === "ADMIN") {
@@ -33,7 +59,8 @@ export async function canAccessDegree(degreeId: string) {
 }
 
 export async function filterAccessibleDegrees(degreeIds: string[]) {
-  const session = await requireAuth();
+  const session = await auth();
+  if (!session?.user) return [];
   
   // ADMIN can access all degrees
   if (session.user.role === "ADMIN") {

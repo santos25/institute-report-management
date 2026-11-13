@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/db/prisma";
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAuthOrThrow } from "@/lib/auth-helpers";
 
 export interface StudentReport {
   student: {
@@ -26,7 +26,7 @@ export async function getStudentReportsByDegreeAndYear(
   degreeId: string,
   year: string
 ): Promise<StudentReport[]> {
-  const session = await requireAuth();
+  const session = await requireAuthOrThrow();
 
   // Authorization check
   if (session.user.role === "TEACHER") {

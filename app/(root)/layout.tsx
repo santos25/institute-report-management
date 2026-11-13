@@ -1,4 +1,5 @@
 import { Header } from "@/components/shared/header";
+import { SessionGuard } from "@/components/auth/SessionGuard";
 import React from "react";
 
 export default function RootLayout({
@@ -8,6 +9,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className="max-w-[1600px] mx-auto min-h-screen flex flex-col">
+      <SessionGuard />
       <Header />
       <main className="w-full pt-22">{children}</main>    
     </div>

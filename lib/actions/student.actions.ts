@@ -1,10 +1,10 @@
 "use server";
 
 import prisma from "@/db/prisma";
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAuthOrThrow } from "@/lib/auth-helpers";
 
 export async function getStudentsByDegree(degreeId: string) {
-  const session = await requireAuth();
+  const session = await requireAuthOrThrow();
 
   // Authorization check
   if (session.user.role === "TEACHER") {

@@ -3,14 +3,17 @@
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 
-export async function authenticate(formData: FormData) {
+export async function authenticate(
+  formData: FormData,
+  callbackUrl?: string
+) {
   try {
     await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
       redirect: false,
     });
-    return { success: true };
+    return { success: true, callbackUrl };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -25,5 +28,5 @@ export async function authenticate(formData: FormData) {
 }
 
 export async function logout() {
-  await signOut({ redirectTo: "/login" });
+  await signOut({ redirect: false });
 }

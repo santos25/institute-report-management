@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/db/prisma";
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAuthOrThrow } from "@/lib/auth-helpers";
 import { gradeInputSchema } from "@/lib/validation/grade.schema";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ interface GradeData {
 
 export async function saveGrades(grades: GradeData[]) {
   // Check authentication
-  const session = await requireAuth();
+  const session = await requireAuthOrThrow();
 
   // Validate all grades
   try {
@@ -142,7 +142,7 @@ export async function getGradesBySubjectAndPeriod(
   subjectId: string,
   periodId: string
 ) {
-  await requireAuth();
+  await requireAuthOrThrow();
   
   try {
     const grades = await prisma.studentGrade.findMany({
@@ -175,7 +175,7 @@ export async function getGradesByStudentAndPeriod(
   studentId: string,
   periodId: string
 ) {
-  const session = await requireAuth();
+  const session = await requireAuthOrThrow();
   
   try {
     // Check authorization for the student's degree
@@ -215,7 +215,7 @@ export async function getGradesByDegreeAndPeriod(
   degreeId: string,
   periodId: string
 ) {
-  const session = await requireAuth();
+  const session = await requireAuthOrThrow();
 
   // Authorization check
   if (session.user.role === "TEACHER") {
@@ -253,7 +253,7 @@ export async function getGradesAndObservationsBySubjectPeriod(
   periodId: string,
   degreeId: string
 ) {
-  const session = await requireAuth();
+  const session = await requireAuthOrThrow();
 
   // Authorization check
   if (session.user.role === "TEACHER") {

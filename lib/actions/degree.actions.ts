@@ -1,10 +1,10 @@
 "use server";
 
 import prisma from "@/db/prisma";
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAuthOrThrow } from "@/lib/auth-helpers";
 
 export async function getDegrees() {
-  const session = await requireAuth();
+  const session = await requireAuthOrThrow();
 
   try {
     // If TEACHER, only return their assigned degrees
