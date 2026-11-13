@@ -30,7 +30,7 @@ interface Student {
 
 interface Grade {
   id: string;
-  grade: number;
+  grade: number | null;
   achievements: string | null;
   studentId: string;
   student: Student;

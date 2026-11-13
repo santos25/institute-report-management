@@ -8,10 +8,23 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isProtectedRoute =
-    pathname.startsWith("/planillas") || pathname.startsWith("/boletines");
+    pathname.startsWith("/planillas") ||
+    pathname.startsWith("/boletines") ||
+    pathname.startsWith("/portal");
 
-  // Add Cache-Control headers for protected routes
   if (isProtectedRoute) {
+    // Check if user is authenticated
+    const session = req.auth;
+    
+    if (!session?.user) {
+      // Not authenticated, redirect to login with callback URL
+      const callbackUrl = encodeURIComponent(pathname);
+      return NextResponse.redirect(
+        new URL(`/login?callbackUrl=${callbackUrl}`, req.url)
+      );
+    }
+
+    // Authenticated, add Cache-Control headers
     const response = NextResponse.next();
     response.headers.set(
       "Cache-Control",

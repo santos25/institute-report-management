@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PlanillasPage } from "@/components/planillas/planillas-page";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/db/prisma";
 import { filterAccessibleDegrees } from "@/lib/auth-helpers";
 
 interface PageProps {

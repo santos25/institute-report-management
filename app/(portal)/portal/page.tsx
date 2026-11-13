@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PortalHome } from "@/components/portal/home";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/db/prisma";
 
 export default async function PortalPage() {
   const session = await auth();
@@ -49,9 +49,6 @@ export default async function PortalPage() {
               student: {
                 degreeId: degree.id,
               },
-              grade: {
-                not: null,
-              },
             },
           })
         : 0;
@@ -66,9 +63,6 @@ export default async function PortalPage() {
                   subjectId: subject.id,
                   student: {
                     degreeId: degree.id,
-                  },
-                  grade: {
-                    not: null,
                   },
                 },
               })

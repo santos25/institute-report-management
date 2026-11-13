@@ -20,9 +20,9 @@ interface GradeData {
 
 interface GradeGridProps {
   students: Student[];
-  subjectId: string; // eslint-disable-line @typescript-eslint/no-unused-vars
+  subjectId: string;
   subjectName: string;
-  periodId: string; // eslint-disable-line @typescript-eslint/no-unused-vars
+  periodId: string;
   initialGrades: GradeData[];
 }
 

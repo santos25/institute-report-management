@@ -27,6 +27,7 @@ import {
 interface PortalSidebarProps {
   user: {
     name?: string | null;
+    email?: string | null;
     role?: string;
   };
 }
@@ -332,6 +333,15 @@ function SidebarContent({ user, onItemClick }: PortalSidebarProps & { onItemClic
 }
 
 export function PortalSidebar({ user }: PortalSidebarProps) {
+  const isAdmin = user.role === "ADMIN";
+  const roleLabel = isAdmin ? "Administración" : "Docente";
+  const initials = user.name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "U";
+
   return (
     <>
       {/* Desktop Sidebar */}
