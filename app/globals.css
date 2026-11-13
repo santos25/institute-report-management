@@ -59,6 +59,45 @@
   --shadow-xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
     0px 8px 10px -2px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
+  
+  /* Brand colors from spec */
+  --brand-50: #F3F1FF;
+  --brand-100: #E7E3FF;
+  --brand-200: #CEC6FF;
+  --brand-600: #5B47E0;
+  --brand-700: #4A36C7;
+  --brand-800: #3B2BA0;
+  
+  --navy: #1B1F3B;
+  --ink: #1F2433;
+  --muted-text: #596074;
+  --line: #E3E5EE;
+  --canvas: #F7F7FB;
+  
+  --rosa-50: #FDEEF6;
+  --rosa-500: #E23E9B;
+  --rosa-600: #C42A82;
+  
+  --sol-50: #FFF7E0;
+  --sol-400: #FFC83D;
+  --sol-500: #F5A623;
+  --sol-700: #9A5B00;
+  
+  --ok-50: #E8F7EE;
+  --ok-600: #15803D;
+  --ok-700: #146C36;
+  
+  --info-50: #EAF2FF;
+  --info-600: #1D5FD1;
+  
+  --warn-50: #FFF6E5;
+  --warn-600: #B45309;
+  
+  --bad-50: #FDECEC;
+  --bad-600: #C81E1E;
+  --bad-700: #A51818;
+  
+  --shadow-card: 0 1px 2px rgba(27,31,59,.06), 0 4px 16px rgba(27,31,59,.06);
 }
 
 .dark {
