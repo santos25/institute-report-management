@@ -1,7 +1,8 @@
 "use server";
 
-import { signIn, signOut } from "@/auth";
+import { signIn, signOut, auth } from "@/auth";
 import { AuthError } from "next-auth";
+import { sanitizeCallbackUrl } from "@/lib/auth-utils";
 
 export async function authenticate(
   formData: FormData,
@@ -13,7 +14,23 @@ export async function authenticate(
       password: formData.get("password"),
       redirect: false,
     });
-    return { success: true, callbackUrl };
+
+    const session = await auth();
+    
+    if (!session?.user) {
+      return { error: "Error al iniciar sesión" };
+    }
+
+    let destination = "/portal";
+
+    if (callbackUrl) {
+      const sanitized = sanitizeCallbackUrl(callbackUrl);
+      if (sanitized) {
+        destination = sanitized;
+      }
+    }
+
+    return { success: true, callbackUrl: destination };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

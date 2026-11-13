@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { authenticate } from "@/lib/actions/auth.actions";
 import { sanitizeCallbackUrl } from "@/lib/auth-client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -12,7 +12,6 @@ export function LoginForm() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [showNotice, setShowNotice] = useState(true);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -46,15 +45,13 @@ export function LoginForm() {
     const formData = new FormData(event.currentTarget);
 
     try {
-      const result = await authenticate(formData, sanitizedCallback);
+      const result = await authenticate(formData, sanitizedCallback || undefined);
 
       if (result?.error) {
         setError(result.error);
-      } else {
-        // Successful login - navigate to callback or default
-        const destination = result?.callbackUrl || sanitizedCallback || "/";
-        router.push(destination);
-        router.refresh();
+      } else if (result?.callbackUrl) {
+        // Successful login - use server-provided destination
+        window.location.href = result.callbackUrl;
       }
     } catch {
       setError("Error al iniciar sesión");

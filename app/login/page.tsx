@@ -1,7 +1,15 @@
 import { LoginForm } from "./login-form";
 import { Suspense } from "react";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await auth();
+  
+  if (session?.user) {
+    redirect("/portal");
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-md space-y-6 rounded-lg border p-8">
