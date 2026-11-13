@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+/**
+ * Normalize grade input by replacing comma with dot
+ * Supports both European (4,5) and US (4.5) decimal separators
+ */
+export function normalizeGradeInput(value: string): string {
+  return value.replace(",", ".");
+}
+
 export const gradeSchema = z
   .number()
   .min(1.0, {

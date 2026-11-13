@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { gradeSchema } from "@/lib/validation/grade.schema";
+import { gradeSchema, normalizeGradeInput } from "@/lib/validation/grade.schema";
 
 import {
   Select,
@@ -107,7 +107,7 @@ export default function GradeEntryForm({
   };
 
   const handleGradeChange = (studentId: string, value: string) => {
-    // Update the grade value
+    // Update the grade value (keep original input for display)
     setGrades((prev) => ({ ...prev, [studentId]: value }));
 
     // Clear error if field is empty
@@ -120,8 +120,9 @@ export default function GradeEntryForm({
       return;
     }
 
-    // Validate using Zod schema
-    const numValue = parseFloat(value);
+    // Normalize comma to dot and validate using Zod schema
+    const normalizedValue = normalizeGradeInput(value);
+    const numValue = parseFloat(normalizedValue);
     const validation = gradeSchema.safeParse(numValue);
 
     if (!validation.success) {
@@ -159,7 +160,8 @@ export default function GradeEntryForm({
     const invalidGrades: string[] = [];
     Object.entries(grades).forEach(([studentId, gradeValue]) => {
       if (gradeValue && gradeValue.trim() !== "") {
-        const numValue = parseFloat(gradeValue);
+        const normalizedValue = normalizeGradeInput(gradeValue);
+        const numValue = parseFloat(normalizedValue);
         const validation = gradeSchema.safeParse(numValue);
         if (!validation.success) {
           const student = students.find(s => s.id === studentId);
@@ -193,9 +195,10 @@ export default function GradeEntryForm({
       )
       .map((studentId) => {
         // Convert grade string to number for database
-        // Only include valid grades, never default to 0
+        // Normalize comma to dot, then parse
         const gradeString = grades[studentId]?.trim();
-        const gradeValue = gradeString ? parseFloat(gradeString) : undefined;
+        const normalizedGrade = gradeString ? normalizeGradeInput(gradeString) : undefined;
+        const gradeValue = normalizedGrade ? parseFloat(normalizedGrade) : undefined;
 
         // Skip entries with invalid grades
         if (gradeValue !== undefined && (isNaN(gradeValue) || gradeValue < 1.0 || gradeValue > 5.0)) {

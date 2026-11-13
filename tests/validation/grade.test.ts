@@ -1,7 +1,57 @@
 import { describe, it, expect } from "vitest";
-import { gradeSchema } from "@/lib/validation/grade.schema";
+import { gradeSchema, normalizeGradeInput } from "@/lib/validation/grade.schema";
 
 describe("Grade Validation", () => {
+  describe("Comma decimal separator normalization", () => {
+    it("should normalize '4,5' to '4.5'", () => {
+      const normalized = normalizeGradeInput("4,5");
+      expect(normalized).toBe("4.5");
+      const result = gradeSchema.safeParse(parseFloat(normalized));
+      expect(result.success).toBe(true);
+    });
+
+    it("should reject '5,5' as it becomes 5.5 (>5.0)", () => {
+      const normalized = normalizeGradeInput("5,5");
+      expect(normalized).toBe("5.5");
+      const result = gradeSchema.safeParse(parseFloat(normalized));
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0]?.message).toContain("5.0");
+      }
+    });
+
+    it("should reject '3,55' as it has too many decimals", () => {
+      const normalized = normalizeGradeInput("3,55");
+      expect(normalized).toBe("3.55");
+      const result = gradeSchema.safeParse(parseFloat(normalized));
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0]?.message).toContain("decimal");
+      }
+    });
+
+    it("should handle '4.5' unchanged", () => {
+      const normalized = normalizeGradeInput("4.5");
+      expect(normalized).toBe("4.5");
+      const result = gradeSchema.safeParse(parseFloat(normalized));
+      expect(result.success).toBe(true);
+    });
+
+    it("should normalize '1,0' to '1.0' and accept", () => {
+      const normalized = normalizeGradeInput("1,0");
+      expect(normalized).toBe("1.0");
+      const result = gradeSchema.safeParse(parseFloat(normalized));
+      expect(result.success).toBe(true);
+    });
+
+    it("should normalize '5,0' to '5.0' and accept", () => {
+      const normalized = normalizeGradeInput("5,0");
+      expect(normalized).toBe("5.0");
+      const result = gradeSchema.safeParse(parseFloat(normalized));
+      expect(result.success).toBe(true);
+    });
+  });
+
   describe("Valid grades", () => {
     it("should accept grade 1.0", () => {
       const result = gradeSchema.safeParse(1.0);
