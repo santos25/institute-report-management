@@ -32,7 +32,7 @@ export function calculateDesempeno(gradeValue: string): {
     };
   } else if (grade >= 3.0 && grade < 4.0) {
     return {
-      label: "Basico",
+      label: "Básico",
       colorClass: "bg-[#FFF6E5] text-[#B45309]",
     };
   } else if (grade >= 1.0 && grade < 3.0) {
