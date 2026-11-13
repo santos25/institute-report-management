@@ -38,14 +38,16 @@ describe("Autosave retry logic", () => {
 
       const promise = saveWithRetry();
       
-      // First attempt fails immediately
-      await vi.advanceTimersByTimeAsync(0);
+      // First attempt fails immediately, advance to allow microtasks
+      await vi.advanceTimersByTimeAsync(1);
       expect(mockSave).toHaveBeenCalledTimes(1);
 
       // Wait 1 second for first retry
       await vi.advanceTimersByTimeAsync(1000);
       expect(mockSave).toHaveBeenCalledTimes(2);
 
+      // Complete all remaining retries
+      await vi.advanceTimersByTimeAsync(3000 + 8000);
       const result = await promise;
       expect(result).toBe(false);
     });

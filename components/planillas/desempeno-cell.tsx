@@ -32,7 +32,7 @@ export function calculateDesempeno(gradeValue: string): {
     };
   } else if (grade >= 3.0 && grade < 4.0) {
     return {
-      label: "Básico",
+      label: "Basico",
       colorClass: "bg-[#FFF6E5] text-[#B45309]",
     };
   } else if (grade >= 1.0 && grade < 3.0) {
@@ -49,7 +49,7 @@ export function DesempenoCell({ value }: DesempenoCellProps) {
   const desempeno = calculateDesempeno(value);
 
   if (!desempeno) {
-    return <span className="text-xs text-[#596074]">—</span>;
+    return <span className="text-xs text-[#596074]">-</span>;
   }
 
   return (
