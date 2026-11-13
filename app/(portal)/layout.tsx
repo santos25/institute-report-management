@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PortalSidebar } from "@/components/portal/sidebar";
 import { PortalTopBar } from "@/components/portal/top-bar";
+import { SessionGuard } from "@/components/auth/SessionGuard";
+import { SignOutGuard } from "@/components/planillas/SignOutGuard";
 
 export default async function PortalLayout({
   children,
@@ -17,6 +19,8 @@ export default async function PortalLayout({
 
   return (
     <div className="flex min-h-screen bg-[#F7F7FB]">
+      <SessionGuard />
+      <SignOutGuard />
       <PortalSidebar user={session.user} />
       <div className="flex-1 flex flex-col min-w-0">
         <PortalTopBar />
