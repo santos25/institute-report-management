@@ -12,6 +12,11 @@ const loginSchema = z.object({
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
+  session: {
+    strategy: "jwt",
+    maxAge: 12 * 60 * 60, // 12 hours
+    updateAge: 60 * 60, // Update session every 1 hour of activity
+  },
   providers: [
     Credentials({
       async authorize(credentials) {
