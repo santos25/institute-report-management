@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check } from "lucide-react";
 import { GradeGrid } from "./grade-grid";
+import { MobileGradeGrid } from "./mobile-grade-grid";
 
 interface Degree {
   id: string;
@@ -264,53 +265,77 @@ export function PlanillasPage({
         </div>
       )}
 
-      {/* Spreadsheet Grid */}
+      {/* Desktop Spreadsheet Grid */}
       {showTable && students.length > 0 && (
-        <div className="flex-1 overflow-auto px-4 lg:px-6 py-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm text-[#596074]">
-              <b className="text-[#1F2433]">
-                {subjects.find((s) => s.id === selectedSubjectId)?.name}
-              </b>{" "}
-              · {grades.filter((g) => g.grade !== null).length} de {students.length} notas
-              {grades.filter((g) => g.grade !== null).length < students.length && (
-                <> · faltan {students.length - grades.filter((g) => g.grade !== null).length} estudiantes</>
-              )}
-            </p>
-            <p className="text-xs text-[#596074] flex items-center gap-3">
-              <span>
-                <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
-                  Enter
-                </kbd>{" "}
-                baja
-              </span>
-              <span>
-                <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
-                  Tab
-                </kbd>{" "}
-                derecha
-              </span>
-              <span>
-                <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
-                  Shift
-                </kbd>{" "}
-                + tecla para volver
-              </span>
-            </p>
+        <>
+          <div className="hidden md:block flex-1 overflow-auto px-4 lg:px-6 py-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-sm text-[#596074]">
+                <b className="text-[#1F2433]">
+                  {subjects.find((s) => s.id === selectedSubjectId)?.name}
+                </b>{" "}
+                · {grades.filter((g) => g.grade !== null).length} de {students.length} notas
+                {grades.filter((g) => g.grade !== null).length < students.length && (
+                  <> · faltan {students.length - grades.filter((g) => g.grade !== null).length} estudiantes</>
+                )}
+              </p>
+              <p className="text-xs text-[#596074] flex items-center gap-3">
+                <span>
+                  <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
+                    Enter
+                  </kbd>{" "}
+                  baja
+                </span>
+                <span>
+                  <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
+                    Tab
+                  </kbd>{" "}
+                  derecha
+                </span>
+                <span>
+                  <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
+                    Shift
+                  </kbd>{" "}
+                  + tecla para volver
+                </span>
+              </p>
+            </div>
+            
+            <GradeGrid
+              students={students}
+              subjectId={selectedSubjectId!}
+              subjectName={subjects.find((s) => s.id === selectedSubjectId)?.name || ""}
+              periodId={selectedPeriodId!}
+              initialGrades={grades.map((g) => ({
+                studentId: g.student.id,
+                grade: g.grade,
+                achievements: g.achievements,
+              }))}
+            />
           </div>
-          
-          <GradeGrid
-            students={students}
-            subjectId={selectedSubjectId!}
-            subjectName={subjects.find((s) => s.id === selectedSubjectId)?.name || ""}
-            periodId={selectedPeriodId!}
-            initialGrades={grades.map((g) => ({
-              studentId: g.student.id,
-              grade: g.grade,
-              achievements: g.achievements,
-            }))}
-          />
-        </div>
+
+          {/* Mobile Card Layout */}
+          <div className="md:hidden flex-1 overflow-auto">
+            <div className="mb-3 px-4 pt-4">
+              <p className="text-sm text-[#596074]">
+                <b className="text-[#1F2433]">
+                  {subjects.find((s) => s.id === selectedSubjectId)?.name}
+                </b>{" "}
+                · {grades.filter((g) => g.grade !== null).length} de {students.length} notas
+              </p>
+            </div>
+            
+            <MobileGradeGrid
+              students={students}
+              subjectName={subjects.find((s) => s.id === selectedSubjectId)?.name || ""}
+              initialGrades={grades.map((g) => ({
+                studentId: g.student.id,
+                grade: g.grade,
+                achievements: g.achievements,
+              }))}
+            />
+          </div>
+        </>
       )}
 
       {/* No students state */}
