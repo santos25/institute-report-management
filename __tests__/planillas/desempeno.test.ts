@@ -58,7 +58,7 @@ describe("calculateDesempeno", () => {
     it("returns Basico for 3.0", () => {
       const result = calculateDesempeno("3.0");
       expect(result).toEqual({
-        label: "Basico",
+        label: "Básico",
         colorClass: "bg-[#FFF6E5] text-[#B45309]",
       });
     });
@@ -66,7 +66,7 @@ describe("calculateDesempeno", () => {
     it("returns Basico for 3.9", () => {
       const result = calculateDesempeno("3.9");
       expect(result).toEqual({
-        label: "Basico",
+        label: "Básico",
         colorClass: "bg-[#FFF6E5] text-[#B45309]",
       });
     });
@@ -74,7 +74,7 @@ describe("calculateDesempeno", () => {
     it("returns Basico for 3.5", () => {
       const result = calculateDesempeno("3.5");
       expect(result).toEqual({
-        label: "Basico",
+        label: "Básico",
         colorClass: "bg-[#FFF6E5] text-[#B45309]",
       });
     });
@@ -118,7 +118,7 @@ describe("calculateDesempeno", () => {
     it("normalizes comma in middle range", () => {
       const result = calculateDesempeno("3,5");
       expect(result).toEqual({
-        label: "Basico",
+        label: "Básico",
         colorClass: "bg-[#FFF6E5] text-[#B45309]",
       });
     });
@@ -136,7 +136,7 @@ describe("calculateDesempeno", () => {
     it("3.99 is Basico, not Alto", () => {
       const result = calculateDesempeno("3.99");
       expect(result).toEqual({
-        label: "Basico",
+        label: "Básico",
         colorClass: "bg-[#FFF6E5] text-[#B45309]",
       });
     });
