@@ -4,9 +4,6 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 
-// Debug environment variables
-console.log("DATABASE_URL:", process.env.DATABASE_URL);
-
 // Configure WebSocket for Neon
 neonConfig.webSocketConstructor = ws;
 
