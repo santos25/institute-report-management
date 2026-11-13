@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { gradeSchema } from "@/lib/validation/grade.schema";
 
 import {
   Select,
@@ -48,6 +49,7 @@ export default function GradeEntryForm({
   const [grades, setGrades] = useState<Record<string, string>>({});
   const [achievements, setAchievements] = useState<Record<string, string>>({});
   const [observations, setObservations] = useState<Record<string, string>>({});
+  const [gradeErrors, setGradeErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -101,24 +103,38 @@ export default function GradeEntryForm({
     setGrades({});
     setAchievements({});
     setObservations({});
+    setGradeErrors({});
   };
 
   const handleGradeChange = (studentId: string, value: string) => {
-    // Allow empty input for clearing the field
-    if (value === "") {
-      setGrades((prev) => ({ ...prev, [studentId]: value }));
+    // Update the grade value
+    setGrades((prev) => ({ ...prev, [studentId]: value }));
+
+    // Clear error if field is empty
+    if (value === "" || value === null) {
+      setGradeErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[studentId];
+        return newErrors;
+      });
       return;
     }
 
-    // Validate numeric input with up to one decimal place
-    const numericRegex = /^([1-5](\.\d{0,1})?)?$/;
+    // Validate using Zod schema
+    const numValue = parseFloat(value);
+    const validation = gradeSchema.safeParse(numValue);
 
-    if (numericRegex.test(value)) {
-      // Check if it's within valid range (1.0 to 5.0)
-      const numValue = parseFloat(value);
-      if (numValue >= 1.0 && numValue <= 5.0) {
-        setGrades((prev) => ({ ...prev, [studentId]: value }));
-      }
+    if (!validation.success) {
+      // Set error message from Zod
+      const errorMessage = validation.error.issues[0]?.message || "Nota inválida";
+      setGradeErrors((prev) => ({ ...prev, [studentId]: errorMessage }));
+    } else {
+      // Clear error if valid
+      setGradeErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[studentId];
+        return newErrors;
+      });
     }
   };
 
@@ -132,6 +148,31 @@ export default function GradeEntryForm({
   };
 
   const handleSave = async () => {
+    // Check for validation errors before saving
+    const hasErrors = Object.keys(gradeErrors).length > 0;
+    if (hasErrors) {
+      toast.error("Por favor corrija los errores de validación antes de guardar");
+      return;
+    }
+
+    // Validate all grades one more time before saving
+    const invalidGrades: string[] = [];
+    Object.entries(grades).forEach(([studentId, gradeValue]) => {
+      if (gradeValue && gradeValue.trim() !== "") {
+        const numValue = parseFloat(gradeValue);
+        const validation = gradeSchema.safeParse(numValue);
+        if (!validation.success) {
+          const student = students.find(s => s.id === studentId);
+          invalidGrades.push(student?.name || studentId);
+        }
+      }
+    });
+
+    if (invalidGrades.length > 0) {
+      toast.error(`Hay notas inválidas para: ${invalidGrades.join(", ")}`);
+      return;
+    }
+
     setSaving(true);
 
     // Create an array of student IDs that belong to this degree
@@ -152,24 +193,25 @@ export default function GradeEntryForm({
       )
       .map((studentId) => {
         // Convert grade string to number for database
-        let gradeValue = 0;
-        if (grades[studentId] && grades[studentId].trim() !== "") {
-          gradeValue = parseFloat(grades[studentId]);
-          // Ensure it's a valid number
-          if (isNaN(gradeValue)) {
-            gradeValue = 0;
-          }
+        // Only include valid grades, never default to 0
+        const gradeString = grades[studentId]?.trim();
+        const gradeValue = gradeString ? parseFloat(gradeString) : undefined;
+
+        // Skip entries with invalid grades
+        if (gradeValue !== undefined && (isNaN(gradeValue) || gradeValue < 1.0 || gradeValue > 5.0)) {
+          return null;
         }
 
         return {
           studentId,
           subjectId: selectedSubject,
           periodId: period.id,
-          value: gradeValue,
+          value: gradeValue || 0, // Backend validation will catch this if sent
           achievements: achievements[studentId] || "",
           observation: observations[studentId] || "",
         };
-      });
+      })
+      .filter((grade): grade is NonNullable<typeof grade> => grade !== null);
 
     if (gradesToSave.length === 0) {
       toast.error("No hay calificaciones, logros o observaciones para guardar");
@@ -328,10 +370,7 @@ export default function GradeEntryForm({
                             <TableCell className="w-[5%] p-4 align-middle text-center">
                               <div className="relative mt-4">
                                 <Input
-                                  type="number"
-                                  step="0.1"
-                                  min="1.0"
-                                  max="5.0"
+                                  type="text"
                                   placeholder="0.0"
                                   value={grades[student.id] || ""}
                                   onChange={(e) =>
@@ -340,11 +379,21 @@ export default function GradeEntryForm({
                                       e.target.value
                                     )
                                   }
-                                  className="w-16 text-center font-bold text-lg border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  className={`w-16 text-center font-bold text-lg focus:ring-2 ${
+                                    gradeErrors[student.id]
+                                      ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                                      : "border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                                  }`}
                                 />
-                                <span className="block text-xs text-gray-500 mt-1">
-                                  /5.0
-                                </span>
+                                {gradeErrors[student.id] ? (
+                                  <span className="block text-xs text-red-600 mt-1 whitespace-nowrap">
+                                    {gradeErrors[student.id]}
+                                  </span>
+                                ) : (
+                                  <span className="block text-xs text-gray-500 mt-1">
+                                    /5.0
+                                  </span>
+                                )}
                               </div>
                             </TableCell>
                             <TableCell className="w-[5%] p-4 align-middle text-center">
