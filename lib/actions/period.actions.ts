@@ -2,8 +2,11 @@
 
 import prisma from "@/db/prisma";
 import { getActiveSchoolYear } from "@/lib/school-year";
+import { requireAuth } from "@/lib/auth-helpers";
 
 export async function getPeriods() {
+  await requireAuth();
+
   try {
     const year = getActiveSchoolYear();
 

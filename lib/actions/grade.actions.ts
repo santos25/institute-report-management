@@ -1,6 +1,9 @@
 "use server";
 
 import prisma from "@/db/prisma";
+import { requireAuth } from "@/lib/auth-helpers";
+import { gradeInputSchema } from "@/lib/validation/grade.schema";
+import { z } from "zod";
 
 interface GradeData {
   studentId: string;
@@ -12,6 +15,26 @@ interface GradeData {
 }
 
 export async function saveGrades(grades: GradeData[]) {
+  // Check authentication
+  const session = await requireAuth();
+
+  // Validate all grades
+  try {
+    grades.forEach((grade) => {
+      gradeInputSchema.parse(grade);
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: `Validation error: ${error.issues[0]?.message}`,
+      };
+    }
+    return {
+      success: false,
+      error: "Invalid grade data",
+    };
+  }
   try {
     // Start a transaction for all operations
     return await prisma.$transaction(async (tx) => {
@@ -26,6 +49,31 @@ export async function saveGrades(grades: GradeData[]) {
           success: false,
           error: "No period ID provided",
         };
+      }
+
+      // Authorization check: verify the user can access the degree
+      if (grades.length > 0) {
+        const student = await tx.student.findUnique({
+          where: { id: grades[0].studentId },
+          select: { degreeId: true },
+        });
+
+        if (!student) {
+          return {
+            success: false,
+            error: "Student not found",
+          };
+        }
+
+        // TEACHER role can only access their assigned degrees
+        if (session.user.role === "TEACHER") {
+          if (!session.user.degreeIds.includes(student.degreeId)) {
+            return {
+              success: false,
+              error: "Forbidden: You don't have access to this degree",
+            };
+          }
+        }
       }
 
       // Process each grade entry
@@ -94,6 +142,8 @@ export async function getGradesBySubjectAndPeriod(
   subjectId: string,
   periodId: string
 ) {
+  await requireAuth();
+  
   try {
     const grades = await prisma.studentGrade.findMany({
       where: {
@@ -125,7 +175,25 @@ export async function getGradesByStudentAndPeriod(
   studentId: string,
   periodId: string
 ) {
+  const session = await requireAuth();
+  
   try {
+    // Check authorization for the student's degree
+    const student = await prisma.student.findUnique({
+      where: { id: studentId },
+      select: { degreeId: true },
+    });
+
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    if (session.user.role === "TEACHER") {
+      if (!session.user.degreeIds.includes(student.degreeId)) {
+        throw new Error("Forbidden: You don't have access to this degree");
+      }
+    }
+
     const grades = await prisma.studentGrade.findMany({
       where: {
         studentId,
@@ -147,6 +215,15 @@ export async function getGradesByDegreeAndPeriod(
   degreeId: string,
   periodId: string
 ) {
+  const session = await requireAuth();
+
+  // Authorization check
+  if (session.user.role === "TEACHER") {
+    if (!session.user.degreeIds.includes(degreeId)) {
+      throw new Error("Forbidden: You don't have access to this degree");
+    }
+  }
+
   try {
     const students = await prisma.student.findMany({
       where: {
@@ -176,6 +253,18 @@ export async function getGradesAndObservationsBySubjectPeriod(
   periodId: string,
   degreeId: string
 ) {
+  const session = await requireAuth();
+
+  // Authorization check
+  if (session.user.role === "TEACHER") {
+    if (!session.user.degreeIds.includes(degreeId)) {
+      return {
+        success: false,
+        error: "Forbidden: You don't have access to this degree",
+      };
+    }
+  }
+
   try {
     // First get the period to determine the year
     const period = await prisma.period.findUnique({

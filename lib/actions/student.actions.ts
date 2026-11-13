@@ -1,8 +1,18 @@
 "use server";
 
 import prisma from "@/db/prisma";
+import { requireAuth } from "@/lib/auth-helpers";
 
 export async function getStudentsByDegree(degreeId: string) {
+  const session = await requireAuth();
+
+  // Authorization check
+  if (session.user.role === "TEACHER") {
+    if (!session.user.degreeIds.includes(degreeId)) {
+      throw new Error("Forbidden: You don't have access to this degree");
+    }
+  }
+
   try {
     const students = await prisma.student.findMany({
       where: {

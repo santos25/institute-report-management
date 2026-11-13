@@ -19,6 +19,7 @@ model Degree {
   name      String    @unique // "Párvulo", "Prejardín", etc.
   subjects  Subject[] // Subjects specific to this degree
   students  Student[]
+  teachers  User[]    // Teachers assigned to this degree
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -63,7 +64,8 @@ model User {
   name      String
   email     String   @unique
   password  String?
-  role      String // "ADMIN", "TEACHER"
+  role      String   // "ADMIN", "TEACHER"
+  degrees   Degree[] // Degrees assigned to this teacher (empty for ADMIN)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

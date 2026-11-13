@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/db/prisma";
+import { requireAuth } from "@/lib/auth-helpers";
 
 export interface StudentReport {
   student: {
@@ -25,6 +26,15 @@ export async function getStudentReportsByDegreeAndYear(
   degreeId: string,
   year: string
 ): Promise<StudentReport[]> {
+  const session = await requireAuth();
+
+  // Authorization check
+  if (session.user.role === "TEACHER") {
+    if (!session.user.degreeIds.includes(degreeId)) {
+      throw new Error("Forbidden: You don't have access to this degree");
+    }
+  }
+
   try {
     // Convert year to integer
     const yearInt = parseInt(year);
