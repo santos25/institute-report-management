@@ -4,11 +4,11 @@ import type { Session } from "next-auth";
 
 // Mock the auth module
 vi.mock("@/auth", () => ({
-  auth: vi.fn(),
+  auth: vi.fn(() => Promise.resolve(null)),
 }));
 
 // Import after mocking
-const { auth } = await import("@/auth");
+const { auth } = await import("@/auth") as { auth: () => Promise<Session | null> };
 
 describe("requireAuth", () => {
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe("requireAuth", () => {
   });
 
   it("should return UNAUTHENTICATED when session has no user", async () => {
-    vi.mocked(auth).mockResolvedValue({ user: undefined, expires: "2024-12-31" } as Session);
+    vi.mocked(auth).mockResolvedValue({ user: undefined, expires: "2024-12-31" } as unknown as Session);
 
     const result = await requireAuth();
 

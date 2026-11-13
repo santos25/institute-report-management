@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 describe("Authorization Rules", () => {
   describe("Role-based access", () => {
     it("ADMIN role can access all degrees", () => {
-      const role = "ADMIN";
+      const role: string = "ADMIN";
       const userDegreeIds: string[] = [];
       const targetDegreeId = "degree-123";
 
@@ -14,7 +14,7 @@ describe("Authorization Rules", () => {
     });
 
     it("TEACHER role can access assigned degrees", () => {
-      const role = "TEACHER";
+      const role: string = "TEACHER";
       const userDegreeIds = ["degree-1", "degree-2"];
       const targetDegreeId = "degree-1";
 
@@ -25,7 +25,7 @@ describe("Authorization Rules", () => {
     });
 
     it("TEACHER role cannot access non-assigned degrees", () => {
-      const role = "TEACHER";
+      const role: string = "TEACHER";
       const userDegreeIds = ["degree-1", "degree-2"];
       const targetDegreeId = "degree-3";
 
@@ -36,7 +36,7 @@ describe("Authorization Rules", () => {
     });
 
     it("TEACHER with no assigned degrees cannot access any degree", () => {
-      const role = "TEACHER";
+      const role: string = "TEACHER";
       const userDegreeIds: string[] = [];
       const targetDegreeId = "degree-1";
 
@@ -46,7 +46,7 @@ describe("Authorization Rules", () => {
     });
 
     it("TEACHER with multiple degrees can access all assigned", () => {
-      const role = "TEACHER";
+      const role: string = "TEACHER";
       const userDegreeIds = ["degree-1", "degree-2", "degree-3"];
 
       const canAccessDegree1 = role === "ADMIN" || userDegreeIds.includes("degree-1");
@@ -63,7 +63,7 @@ describe("Authorization Rules", () => {
 
   describe("Degree filtering", () => {
     it("ADMIN gets all requested degrees", () => {
-      const role = "ADMIN";
+      const role: string = "ADMIN";
       const userDegreeIds: string[] = [];
       const requestedDegrees = ["degree-1", "degree-2", "degree-3"];
 
@@ -76,7 +76,7 @@ describe("Authorization Rules", () => {
     });
 
     it("TEACHER gets only assigned degrees from requested list", () => {
-      const role = "TEACHER";
+      const role: string = "TEACHER";
       const userDegreeIds = ["degree-1", "degree-3"];
       const requestedDegrees = ["degree-1", "degree-2", "degree-3"];
 
@@ -89,7 +89,7 @@ describe("Authorization Rules", () => {
     });
 
     it("TEACHER gets empty array when no assigned degrees match", () => {
-      const role = "TEACHER";
+      const role: string = "TEACHER";
       const userDegreeIds = ["degree-4", "degree-5"];
       const requestedDegrees = ["degree-1", "degree-2", "degree-3"];
 
