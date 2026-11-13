@@ -20,7 +20,7 @@ interface GradeData {
 
 interface GradeGridProps {
   students: Student[];
-  subjectId: string;
+  subjectId: string; // eslint-disable-line @typescript-eslint/no-unused-vars
   subjectName: string;
   periodId: string; // eslint-disable-line @typescript-eslint/no-unused-vars
   initialGrades: GradeData[];
@@ -43,9 +43,7 @@ type ColumnType = typeof COLUMNS[number];
 
 export function GradeGrid({
   students,
-  subjectId,
   subjectName,
-  periodId,
   initialGrades,
 }: GradeGridProps) {
   // Initialize cell states

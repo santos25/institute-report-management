@@ -84,7 +84,6 @@ export function hasUnsavedChanges(): {
     return { has: false, affectedStudents: [], isSaving: false };
   }
 
-  const affectedStudents: AffectedStudent[] = [];
   let isSaving = false;
 
   // Group by student

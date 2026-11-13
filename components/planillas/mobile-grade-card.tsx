@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { GradeCell } from "./grade-cell";
 import { DesempenoCell } from "./desempeno-cell";
 import { EstadoCell } from "./estado-cell";

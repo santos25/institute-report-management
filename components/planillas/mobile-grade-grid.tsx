@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { MobileGradeCard } from "./mobile-grade-card";
 
 interface Student {

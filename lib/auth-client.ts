@@ -9,7 +9,6 @@ import {
   hasUnsavedChanges,
   waitForSaves,
   clearPlanillaState,
-  getPlanillaState,
 } from "./planillas-state";
 
 /**
