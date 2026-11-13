@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check } from "lucide-react";
+import { GradeGrid } from "./grade-grid";
 
 interface Degree {
   id: string;
@@ -263,7 +264,7 @@ export function PlanillasPage({
         </div>
       )}
 
-      {/* Table Area - TODO: Implement spreadsheet grid */}
+      {/* Spreadsheet Grid */}
       {showTable && students.length > 0 && (
         <div className="flex-1 overflow-auto px-4 lg:px-6 py-4">
           <div className="mb-3 flex items-center justify-between">
@@ -272,16 +273,43 @@ export function PlanillasPage({
                 {subjects.find((s) => s.id === selectedSubjectId)?.name}
               </b>{" "}
               · {grades.filter((g) => g.grade !== null).length} de {students.length} notas
+              {grades.filter((g) => g.grade !== null).length < students.length && (
+                <> · faltan {students.length - grades.filter((g) => g.grade !== null).length} estudiantes</>
+              )}
+            </p>
+            <p className="text-xs text-[#596074] flex items-center gap-3">
+              <span>
+                <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
+                  Enter
+                </kbd>{" "}
+                baja
+              </span>
+              <span>
+                <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
+                  Tab
+                </kbd>{" "}
+                derecha
+              </span>
+              <span>
+                <kbd className="px-1.5 py-0.5 rounded border border-[#E3E5EE] bg-white font-sans">
+                  Shift
+                </kbd>{" "}
+                + tecla para volver
+              </span>
             </p>
           </div>
           
-          {/* Placeholder for the actual spreadsheet grid */}
-          <div className="rounded-xl border border-[#E3E5EE] bg-white p-8 text-center text-[#596074]">
-            <p>Spreadsheet grid will be implemented here</p>
-            <p className="text-sm mt-2">
-              {students.length} estudiantes · {grades.length} grades loaded
-            </p>
-          </div>
+          <GradeGrid
+            students={students}
+            subjectId={selectedSubjectId!}
+            subjectName={subjects.find((s) => s.id === selectedSubjectId)?.name || ""}
+            periodId={selectedPeriodId!}
+            initialGrades={grades.map((g) => ({
+              studentId: g.student.id,
+              grade: g.grade,
+              achievements: g.achievements,
+            }))}
+          />
         </div>
       )}
 
