@@ -9,7 +9,8 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const isOnProtectedRoute =
         nextUrl.pathname.startsWith("/planillas") ||
-        nextUrl.pathname.startsWith("/boletines");
+        nextUrl.pathname.startsWith("/boletines") ||
+        nextUrl.pathname.startsWith("/portal");
 
       if (isOnProtectedRoute) {
         if (isLoggedIn) return true;
