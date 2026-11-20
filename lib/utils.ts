@@ -12,6 +12,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Nombre de archivo: Boletines-<Grado>-<Año> */
+export function boletinDownloadTitle(
+  degreeName: string | undefined,
+  year: string
+) {
+  const grado = (degreeName || "Grado")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return `Boletines-${grado || "Grado"}-${year}`;
+}
+
 export const calculateFinalGrade = (
   subject: SubjectData,
   periodNumbers: number[]
