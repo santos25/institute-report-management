@@ -1,22 +1,32 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fredoka, Nunito } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE } from "@/lib/site";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fredoka = Fredoka({
+  variable: "--font-fredoka",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Instituto Angelitos Alegres",
-  description: "A platform to generate report for each student",
+  title: "Instituto Angelitos Alegres | Preescolar en Nuevo Bosque, Cartagena",
+  description:
+    "Formando el futuro de nuestros niños y niñas con amor, dedicación y excelencia educativa. Preescolar en Nuevo Bosque, Cartagena.",
+  openGraph: {
+    title: SITE.name,
+    description: SITE.tagline,
+    locale: "es_CO",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -25,10 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="es" className={`${nunito.variable} ${fredoka.variable}`}>
+      <body className="font-sans antialiased">
         {children}
         <Toaster position="bottom-center" richColors />
       </body>
