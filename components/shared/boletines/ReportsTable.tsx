@@ -11,9 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StudentReport } from "@/lib/actions/report.actions";
-import { formatStudentReport } from "@/lib/utils";
+import { boletinDownloadTitle, formatStudentReport } from "@/lib/utils";
 import { Degree } from "@prisma/client";
-import { Printer, FileText, Download } from "lucide-react";
+import { Printer, FileText, Download, Loader2 } from "lucide-react";
 import BoletinPrint from "./BoletinPrint";
 import BulkBoletinPrint from "./BulkBoletinPrint";
 import { useRef, useState } from "react";
@@ -43,6 +43,7 @@ type ReportsTableProps = {
   degrees: Degree[];
   selectedDegree: string;
   selectedYear: string;
+  selectedPeriod: string;
   studentReports: StudentReport[];
 };
 
@@ -51,21 +52,37 @@ export default function ReportsTable({
   degrees,
   selectedDegree,
   selectedYear,
+  selectedPeriod,
   studentReports,
 }: ReportsTableProps) {
   const boletinPrintRef = useRef<HTMLDivElement>(null);
   const bulkBoletinPrintRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef: boletinPrintRef });
-  const reactToPrintBulkFn = useReactToPrint({ 
-    contentRef: bulkBoletinPrintRef,
-    documentTitle: `Boletines-${degrees.find((d) => d.id === selectedDegree)?.name}-Periodo-Todos-${selectedYear}`,
-  });
   const [selectedReportForPrint, setSelectedReportForPrint] =
     useState<FormattedStudentReport | null>(null);
-  const [bulkPrintReports, setBulkPrintReports] = useState<FormattedStudentReport[]>([]);
+  const [bulkPrintReports, setBulkPrintReports] = useState<
+    FormattedStudentReport[]
+  >([]);
   const [isBulkPrinting, setIsBulkPrinting] = useState(false);
 
   const degreeName = degrees.find((d) => d.id === selectedDegree)?.name;
+  const periodNumber = Number(selectedPeriod);
+
+  const bulkDocumentTitle = boletinDownloadTitle(
+    degreeName,
+    periodNumber,
+    selectedYear
+  );
+
+  const reactToPrintBulkFn = useReactToPrint({
+    contentRef: bulkBoletinPrintRef,
+    documentTitle: bulkDocumentTitle,
+    onAfterPrint: () => setIsBulkPrinting(false),
+    onPrintError: () => {
+      setIsBulkPrinting(false);
+      alert("No se pudo preparar la impresión de los boletines.");
+    },
+  });
 
   const handlePrintReport = (studentId: string) => {
     const reportData = studentReports.find(
@@ -83,24 +100,22 @@ export default function ReportsTable({
 
   const handlePrintAllReports = () => {
     if (studentReports.length === 0) {
-      alert("No hay boletines para imprimir");
+      alert("Este grado no tiene boletines para el año seleccionado.");
       return;
     }
 
     setIsBulkPrinting(true);
-    
-    // Format all reports
+
     const formattedReports = studentReports.map((report) =>
       formatStudentReport(report, degrees)
     );
-    
+
     setBulkPrintReports(formattedReports);
-    
-    // Small delay to ensure state is updated before printing
-    setTimeout(() => {
+
+    // Espera a que el mismo boletín individual quede en el DOM antes de imprimir.
+    window.setTimeout(() => {
       reactToPrintBulkFn();
-      setIsBulkPrinting(false);
-    }, 100);
+    }, 150);
   };
 
   return (
@@ -117,7 +132,7 @@ export default function ReportsTable({
                   Boletines de Calificaciones
                 </CardTitle>
                 <p className="text-sm  mt-1">
-                  {degreeName} - Año {selectedYear}
+                  {degreeName} - Periodo {selectedPeriod} - Año {selectedYear}
                 </p>
               </div>
             </div>
@@ -125,11 +140,16 @@ export default function ReportsTable({
               <Button
                 onClick={handlePrintAllReports}
                 disabled={isBulkPrinting}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                aria-busy={isBulkPrinting}
+                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
                 size="default"
               >
-                <Download className="h-4 w-4 mr-2" />
-                {isBulkPrinting ? "Preparando..." : "Imprimir Todos"}
+                {isBulkPrinting ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                {isBulkPrinting ? "Preparando..." : "Imprimir todos"}
               </Button>
             )}
           </div>
@@ -219,7 +239,7 @@ export default function ReportsTable({
               </h3>
               <p className="text-gray-500 dark:text-gray-400 max-w-md">
                 No hay información de calificaciones para los estudiantes en
-                este grado y año académico.
+                este grado, periodo y año académico.
               </p>
             </div>
           )}

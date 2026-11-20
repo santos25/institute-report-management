@@ -11,9 +11,9 @@ Esta funcionalidad permite descargar todos los boletines de calificaciones de un
 ## 💡 Cómo usar
 
 ### Paso 1: Seleccionar grado y año
-1. En la página de Boletines, selecciona un **Grado** del dropdown
-2. Selecciona un **Año** académico
-3. Haz clic en el botón **"Buscar"**
+1. En la página de Boletines, selecciona el **Año**, el **Periodo** y el **Grado**
+2. Haz clic en **"Generar Boletines"**
+3. El listado y el PDF incluyen solo ese periodo
 
 ### Paso 2: Imprimir todos los boletines
 4. Una vez cargada la tabla de estudiantes, verás un botón verde **"Imprimir Todos"** en la parte superior derecha
@@ -24,19 +24,19 @@ Esta funcionalidad permite descargar todos los boletines de calificaciones de un
 ### Paso 3: Guardar como PDF
 8. En el diálogo de impresión:
    - Selecciona **"Guardar como PDF"** como destino
-   - El nombre sugerido será: `Boletines-[Grado]-Periodo-Todos-[Año].pdf`
+   - El nombre sugerido será: `Boletines-<Grado>-Periodo-<N>-<Año>.pdf` (N es el periodo elegido)
    - Haz clic en **"Guardar"**
 
 ## 📄 Características
 
 ### ✅ Lo que incluye
-- **Todos los estudiantes** del grado seleccionado
-- **Todos los periodos** registrados para el año académico
+- **Todos los estudiantes** del grado que tengan notas en el periodo elegido
+- **Solo el periodo seleccionado** (notas y observación de ese periodo)
 - **Formato idéntico** al boletín individual:
   - Logo institucional
   - Información del estudiante
   - Tabla de calificaciones por materia y periodo
-  - Observaciones del último periodo
+  - Observación del periodo seleccionado
   - Sección de firmas
   - Escala de calificación (Bajo, Básico, Alto, Superior)
 
@@ -54,7 +54,7 @@ Esta funcionalidad permite descargar todos los boletines de calificaciones de un
 ## ⚙️ Detalles técnicos
 
 ### Archivos nuevos
-- `components/shared/boletines/BulkBoletinPrint.tsx`
+- `components/shared/boletines/BulkBoletinPrint.tsx` (reutiliza `BoletinPrint`, sin duplicar el diseño)
 
 ### Archivos modificados
 - `components/shared/boletines/ReportsTable.tsx`
@@ -99,7 +99,7 @@ Esta funcionalidad permite descargar todos los boletines de calificaciones de un
 |----------------|-----------|--------|
 | **Estudiantes por PDF** | 1 | Todos del grado |
 | **Clicks necesarios** | 1 por estudiante | 1 total |
-| **Nombre archivo** | `Boletines-...` | `Boletines-[Grado]-Periodo-Todos-[Año].pdf` |
+| **Nombre archivo** | `Boletines-...` | `Boletines-<Grado>-Periodo-<N>-<Año>.pdf` |
 | **Botón ubicación** | Tabla, fila del estudiante | Cabecera de la tabla |
 | **Color botón** | Azul | Verde |
 | **Ícono** | Printer | Download |

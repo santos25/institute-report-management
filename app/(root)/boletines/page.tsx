@@ -1,6 +1,8 @@
 import { getDegrees } from "@/lib/actions/degree.actions";
 import BoletinesPageClient from "./BoletinesPageClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function BoletinHome() {
   const degrees = await getDegrees();
 

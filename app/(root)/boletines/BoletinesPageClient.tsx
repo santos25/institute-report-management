@@ -15,6 +15,22 @@ const YEARS = Array.from({ length: 2 }, (_, i) => {
   return { id: year.toString(), year };
 });
 
+const PERIODS = [1, 2, 3, 4].map((number) => ({
+  id: number.toString(),
+  number,
+}));
+
+function reportsForPeriod(reports: StudentReport[], periodNumber: number) {
+  return reports
+    .map((report) => ({
+      ...report,
+      periodGrades: report.periodGrades.filter(
+        (period) => period.periodNumber === periodNumber
+      ),
+    }))
+    .filter((report) => report.periodGrades.length > 0);
+}
+
 interface BoletinesPageClientProps {
   initialDegrees: Degree[];
 }
@@ -27,6 +43,7 @@ export default function BoletinesPageClient({
   const [reportYear, setReportYear] = useState(
     new Date().getFullYear().toString()
   );
+  const [reportPeriod, setReportPeriod] = useState("");
   const [showReports, setShowReports] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [studentReports, setStudentReports] = useState<StudentReport[]>([]);
@@ -42,17 +59,23 @@ export default function BoletinesPageClient({
     setShowReports(false);
   };
 
+  const handleReportPeriodChange = (value: string) => {
+    setReportPeriod(value);
+    setShowReports(false);
+  };
+
   const handleSearchReports = async () => {
-    if (reportDegree && reportYear) {
+    if (reportDegree && reportYear && reportPeriod) {
       setReportLoading(true);
       try {
-        // Fetch report data for all students in selected degree for all periods in the year
         const reports = await getStudentReportsByDegreeAndYear(
           reportDegree,
           reportYear
         );
 
-        setStudentReports(reports);
+        setStudentReports(
+          reportsForPeriod(reports, Number(reportPeriod))
+        );
         setShowReports(true);
       } catch (error) {
         console.error("Error fetching report data:", error);
@@ -72,10 +95,13 @@ export default function BoletinesPageClient({
       <ReportSelection
         degrees={initialDegrees}
         years={YEARS}
+        periods={PERIODS}
         selectedDegree={reportDegree}
         selectedYear={reportYear}
+        selectedPeriod={reportPeriod}
         onDegreeChange={handleReportDegreeChange}
         onYearChange={handleReportYearChange}
+        onPeriodChange={handleReportPeriodChange}
         onSearch={handleSearchReports}
         loading={reportLoading}
       />
@@ -85,6 +111,7 @@ export default function BoletinesPageClient({
           degrees={initialDegrees}
           selectedDegree={reportDegree}
           selectedYear={reportYear}
+          selectedPeriod={reportPeriod}
           studentReports={studentReports}
         />
       )}

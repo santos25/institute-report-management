@@ -10,13 +10,15 @@ const BoletinPrint = ({
   printRef,
   report,
   year,
+  className = "",
 }: {
-  printRef: React.RefObject<HTMLDivElement>;
+  printRef?: React.RefObject<HTMLDivElement | null>;
   report: FormattedStudentReport | null;
   year: string;
+  className?: string;
 }) => {
   return (
-    <div ref={printRef} className="max-w-4xl mx-auto bg-white">
+    <div ref={printRef} className={`boletin-sheet max-w-4xl mx-auto bg-white ${className}`}>
       <style>{`
         @media print {
           @page {
