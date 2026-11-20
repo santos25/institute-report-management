@@ -11,9 +11,8 @@ Esta funcionalidad permite descargar todos los boletines de calificaciones de un
 ## 💡 Cómo usar
 
 ### Paso 1: Seleccionar grado y año
-1. En la página de Boletines, selecciona el **Año**, el **Periodo** y el **Grado**
+1. En la página de Boletines, selecciona el **Año** y el **Grado**
 2. Haz clic en **"Generar Boletines"**
-3. El listado y el PDF incluyen solo ese periodo
 
 ### Paso 2: Imprimir todos los boletines
 4. Una vez cargada la tabla de estudiantes, verás un botón verde **"Imprimir Todos"** en la parte superior derecha
@@ -24,19 +23,19 @@ Esta funcionalidad permite descargar todos los boletines de calificaciones de un
 ### Paso 3: Guardar como PDF
 8. En el diálogo de impresión:
    - Selecciona **"Guardar como PDF"** como destino
-   - El nombre sugerido será: `Boletines-<Grado>-Periodo-<N>-<Año>.pdf` (N es el periodo elegido)
+   - El nombre sugerido será: `Boletines-<Grado>-<Año>.pdf`
    - Haz clic en **"Guardar"**
 
 ## 📄 Características
 
 ### ✅ Lo que incluye
-- **Todos los estudiantes** del grado que tengan notas en el periodo elegido
-- **Solo el periodo seleccionado** (notas y observación de ese periodo)
+- **Todos los estudiantes** del grado que ya aparecen en el listado
+- **Los mismos periodos, notas y observación** que el boletín individual de cada estudiante
 - **Formato idéntico** al boletín individual:
   - Logo institucional
   - Información del estudiante
   - Tabla de calificaciones por materia y periodo
-  - Observación del periodo seleccionado
+  - Observación del último periodo registrado
   - Sección de firmas
   - Escala de calificación (Bajo, Básico, Alto, Superior)
 
@@ -99,7 +98,7 @@ Esta funcionalidad permite descargar todos los boletines de calificaciones de un
 |----------------|-----------|--------|
 | **Estudiantes por PDF** | 1 | Todos del grado |
 | **Clicks necesarios** | 1 por estudiante | 1 total |
-| **Nombre archivo** | `Boletines-...` | `Boletines-<Grado>-Periodo-<N>-<Año>.pdf` |
+| **Nombre archivo** | `Boletines-...` | `Boletines-<Grado>-<Año>.pdf` |
 | **Botón ubicación** | Tabla, fila del estudiante | Cabecera de la tabla |
 | **Color botón** | Azul | Verde |
 | **Ícono** | Printer | Download |

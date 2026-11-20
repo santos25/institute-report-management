@@ -43,7 +43,6 @@ type ReportsTableProps = {
   degrees: Degree[];
   selectedDegree: string;
   selectedYear: string;
-  selectedPeriod: string;
   studentReports: StudentReport[];
 };
 
@@ -52,7 +51,6 @@ export default function ReportsTable({
   degrees,
   selectedDegree,
   selectedYear,
-  selectedPeriod,
   studentReports,
 }: ReportsTableProps) {
   const boletinPrintRef = useRef<HTMLDivElement>(null);
@@ -66,13 +64,8 @@ export default function ReportsTable({
   const [isBulkPrinting, setIsBulkPrinting] = useState(false);
 
   const degreeName = degrees.find((d) => d.id === selectedDegree)?.name;
-  const periodNumber = Number(selectedPeriod);
 
-  const bulkDocumentTitle = boletinDownloadTitle(
-    degreeName,
-    periodNumber,
-    selectedYear
-  );
+  const bulkDocumentTitle = boletinDownloadTitle(degreeName, selectedYear);
 
   const reactToPrintBulkFn = useReactToPrint({
     contentRef: bulkBoletinPrintRef,
@@ -132,7 +125,7 @@ export default function ReportsTable({
                   Boletines de Calificaciones
                 </CardTitle>
                 <p className="text-sm  mt-1">
-                  {degreeName} - Periodo {selectedPeriod} - Año {selectedYear}
+                  {degreeName} - Año {selectedYear}
                 </p>
               </div>
             </div>
@@ -239,7 +232,7 @@ export default function ReportsTable({
               </h3>
               <p className="text-gray-500 dark:text-gray-400 max-w-md">
                 No hay información de calificaciones para los estudiantes en
-                este grado, periodo y año académico.
+                este grado y año académico.
               </p>
             </div>
           )}

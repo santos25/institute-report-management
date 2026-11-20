@@ -12,10 +12,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/** Nombre de archivo: Boletines-<Grado>-Periodo-<N>-<Año> */
+/** Nombre de archivo: Boletines-<Grado>-<Año> */
 export function boletinDownloadTitle(
   degreeName: string | undefined,
-  periodNumber: number,
   year: string
 ) {
   const grado = (degreeName || "Grado")
@@ -24,7 +23,7 @@ export function boletinDownloadTitle(
     .replace(/[^A-Za-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-  return `Boletines-${grado || "Grado"}-Periodo-${periodNumber}-${year}`;
+  return `Boletines-${grado || "Grado"}-${year}`;
 }
 
 export const calculateFinalGrade = (

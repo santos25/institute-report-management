@@ -15,25 +15,19 @@ import { Degree } from "@prisma/client";
 export default function ReportSelection({
   degrees,
   years,
-  periods,
   selectedDegree,
   selectedYear,
-  selectedPeriod,
   onDegreeChange,
   onYearChange,
-  onPeriodChange,
   onSearch,
   loading = false,
 }: {
   degrees: Degree[];
   years: { id: string; year: number }[];
-  periods: { id: string; number: number }[];
   selectedDegree: string;
   selectedYear: string;
-  selectedPeriod: string;
   onDegreeChange: (value: string) => void;
   onYearChange: (value: string) => void;
-  onPeriodChange: (value: string) => void;
   onSearch: () => void;
   loading?: boolean;
 }) {
@@ -41,7 +35,7 @@ export default function ReportSelection({
     <Card className="mb-6 border rounded-lg shadow-sm">
       <CardContent className="">
         <div className="flex flex-col md:flex-row items-end gap-4">
-          <div className="w-full md:flex-1 space-y-2">
+          <div className="w-full md:w-1/3 space-y-2">
             <Label
               htmlFor="reportYear"
               className="text-sm font-medium text-slate-700 dark:text-slate-300"
@@ -65,31 +59,7 @@ export default function ReportSelection({
             </Select>
           </div>
 
-          <div className="w-full md:flex-1 space-y-2">
-            <Label
-              htmlFor="reportPeriod"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
-              Periodo
-            </Label>
-            <Select value={selectedPeriod} onValueChange={onPeriodChange}>
-              <SelectTrigger
-                id="reportPeriod"
-                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <SelectValue placeholder="Seleccionar Periodo" />
-              </SelectTrigger>
-              <SelectContent>
-                {periods.map((period) => (
-                  <SelectItem key={period.id} value={period.id}>
-                    Periodo {period.number}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="w-full md:flex-1 space-y-2">
+          <div className="w-full md:w-1/3 space-y-2">
             <Label
               htmlFor="reportDegree"
               className="text-sm font-medium text-slate-700 dark:text-slate-300"
@@ -113,13 +83,11 @@ export default function ReportSelection({
             </Select>
           </div>
 
-          <div className="w-full md:flex-1 md:self-end">
+          <div className="w-full md:w-1/3 md:self-end">
             <Button
               className="w-full font-medium py-2 transition-colors shadow-sm"
               onClick={onSearch}
-              disabled={
-                !selectedDegree || !selectedYear || !selectedPeriod || loading
-              }
+              disabled={!selectedDegree || !selectedYear || loading}
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
