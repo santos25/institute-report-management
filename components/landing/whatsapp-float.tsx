@@ -1,7 +1,6 @@
 import { getWhatsAppUrl } from "@/lib/site";
 import { WhatsAppIcon } from "./whatsapp-icon";
 
-// TODO: El propietario debe confirmar que +57 300 2850238 es un número de WhatsApp.
 export function WhatsAppFloat() {
   return (
     <a

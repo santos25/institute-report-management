@@ -13,11 +13,7 @@ export const SITE = {
   email: "angelitosalegres@hotmail.com",
   phoneDisplay: "+57 300 2850238",
   phoneTel: "+573002850238",
-  /**
-   * TODO: El propietario debe confirmar que este número es WhatsApp.
-   * Hoy se usa el teléfono publicado en el sitio (+57 300 2850238).
-   */
-  whatsappNumber: "573002850238",
+  whatsappNumber: "573012294350",
   hoursWeekday: "Lun - Vie: 7:00 AM - 5:00 PM",
   hoursSaturday: "Sábados: 8:00 AM - 12:00 PM",
   hoursSunday: "Domingos: Cerrado",

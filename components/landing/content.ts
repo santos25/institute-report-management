@@ -122,62 +122,6 @@ export const dayMoments = [
   },
 ];
 
-/*
- * TODO: El propietario debe reemplazar cada paso con el proceso real de matrícula.
- * No inventar requisitos, costos ni documentos.
- */
-export const enrollmentSteps = [
-  {
-    title: "[Por completar] Primer contacto",
-    body: "[Por completar] Describe aquí cómo las familias deben dar el primer paso (por ejemplo, escribir o visitar el instituto).",
-  },
-  {
-    title: "[Por completar] Visita o entrevista",
-    body: "[Por completar] Indica si hay jornada de puertas abiertas, cita previa u otro encuentro.",
-  },
-  {
-    title: "[Por completar] Documentos y matrícula",
-    body: "[Por completar] Lista los documentos y las fechas reales cuando estén confirmados.",
-  },
-];
-
-/*
- * TODO: El propietario debe completar las preguntas marcadas.
- * Las dos primeras se responden solo con datos que ya están en el sitio.
- */
-export const faqs = [
-  {
-    question: "¿Dónde queda el instituto?",
-    answer:
-      "En Nuevo Bosque, Transversal 51 N° 29 B 77, Cartagena, Colombia.",
-    placeholder: false,
-  },
-  {
-    question: "¿Cuál es el horario?",
-    answer:
-      "Lunes a viernes de 7:00 AM a 5:00 PM. Sábados de 8:00 AM a 12:00 PM. Domingos cerrado.",
-    placeholder: false,
-  },
-  {
-    question: "[Por completar] ¿Cuáles son los requisitos de inscripción?",
-    answer:
-      "[Por completar] El equipo del instituto añadirá aquí los requisitos reales de matrícula.",
-    placeholder: true,
-  },
-  {
-    question: "[Por completar] ¿Hay jornada completa o media jornada?",
-    answer:
-      "[Por completar] Confirmar jornadas, edades y cupos disponibles.",
-    placeholder: true,
-  },
-  {
-    question: "[Por completar] ¿Qué deben llevar los niños y las niñas?",
-    answer:
-      "[Por completar] Uniforme, útiles u otros elementos — completar con la información oficial.",
-    placeholder: true,
-  },
-];
-
 export const toneClasses = {
   coral: {
     icon: "bg-coral-100 text-coral-700",
