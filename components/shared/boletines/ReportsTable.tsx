@@ -13,8 +13,9 @@ import {
 import { StudentReport } from "@/lib/actions/report.actions";
 import { formatStudentReport } from "@/lib/utils";
 import { Degree } from "@prisma/client";
-import { Printer, FileText } from "lucide-react";
+import { Printer, FileText, Download } from "lucide-react";
 import BoletinPrint from "./BoletinPrint";
+import BulkBoletinPrint from "./BulkBoletinPrint";
 import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 
@@ -53,9 +54,16 @@ export default function ReportsTable({
   studentReports,
 }: ReportsTableProps) {
   const boletinPrintRef = useRef<HTMLDivElement>(null);
+  const bulkBoletinPrintRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef: boletinPrintRef });
+  const reactToPrintBulkFn = useReactToPrint({ 
+    contentRef: bulkBoletinPrintRef,
+    documentTitle: `Boletines-${degrees.find((d) => d.id === selectedDegree)?.name}-Periodo-Todos-${selectedYear}`,
+  });
   const [selectedReportForPrint, setSelectedReportForPrint] =
     useState<FormattedStudentReport | null>(null);
+  const [bulkPrintReports, setBulkPrintReports] = useState<FormattedStudentReport[]>([]);
+  const [isBulkPrinting, setIsBulkPrinting] = useState(false);
 
   const degreeName = degrees.find((d) => d.id === selectedDegree)?.name;
 
@@ -73,22 +81,57 @@ export default function ReportsTable({
     }
   };
 
+  const handlePrintAllReports = () => {
+    if (studentReports.length === 0) {
+      alert("No hay boletines para imprimir");
+      return;
+    }
+
+    setIsBulkPrinting(true);
+    
+    // Format all reports
+    const formattedReports = studentReports.map((report) =>
+      formatStudentReport(report, degrees)
+    );
+    
+    setBulkPrintReports(formattedReports);
+    
+    // Small delay to ensure state is updated before printing
+    setTimeout(() => {
+      reactToPrintBulkFn();
+      setIsBulkPrinting(false);
+    }, 100);
+  };
+
   return (
     <>
       <Card className="border rounded-lg shadow-sm">
         <CardHeader className="">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <CardTitle className="text-xl text-gray-800 dark:text-gray-200">
+                  Boletines de Calificaciones
+                </CardTitle>
+                <p className="text-sm  mt-1">
+                  {degreeName} - Año {selectedYear}
+                </p>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-xl text-gray-800 dark:text-gray-200">
-                Boletines de Calificaciones
-              </CardTitle>
-              <p className="text-sm  mt-1">
-                {degreeName} - Año {selectedYear}
-              </p>
-            </div>
+            {studentReports.length > 0 && (
+              <Button
+                onClick={handlePrintAllReports}
+                disabled={isBulkPrinting}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                size="default"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {isBulkPrinting ? "Preparando..." : "Imprimir Todos"}
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent className="">
@@ -183,11 +226,19 @@ export default function ReportsTable({
         </CardContent>
       </Card>
 
-      {/* Hidden print component */}
+      {/* Hidden print components */}
       <div style={{ display: "none" }}>
         <BoletinPrint
           printRef={boletinPrintRef as React.RefObject<HTMLDivElement>}
           report={selectedReportForPrint}
+          year={selectedYear}
+        />
+      </div>
+
+      <div style={{ display: "none" }}>
+        <BulkBoletinPrint
+          printRef={bulkBoletinPrintRef as React.RefObject<HTMLDivElement>}
+          reports={bulkPrintReports}
           year={selectedYear}
         />
       </div>
