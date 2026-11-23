@@ -115,27 +115,25 @@ export const calculateDS = (grade: string | number) => {
     return {
       label: "BJ",
       variant: "destructive" as const,
-      color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+      color: "bg-destructive text-destructive-foreground",
     };
   } else if (numericGrade >= 3.0 && numericGrade <= 3.9) {
     return {
       label: "B",
       variant: "secondary" as const,
-      color:
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      color: "bg-warning text-warning-foreground",
     };
   } else if (numericGrade >= 4.0 && numericGrade <= 4.5) {
     return {
       label: "A",
       variant: "default" as const,
-      color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      color: "bg-info text-info-foreground",
     };
   } else if (numericGrade >= 4.6 && numericGrade <= 5.0) {
     return {
       label: "S",
       variant: "default" as const,
-      color:
-        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      color: "bg-success text-success-foreground",
     };
   }
 
