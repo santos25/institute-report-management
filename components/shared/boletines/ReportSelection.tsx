@@ -38,14 +38,14 @@ export default function ReportSelection({
           <div className="w-full md:w-1/3 space-y-2">
             <Label
               htmlFor="reportYear"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
+              className="text-sm font-medium text-foreground"
             >
               Año Académico
             </Label>
             <Select value={selectedYear} onValueChange={onYearChange}>
               <SelectTrigger
                 id="reportYear"
-                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="bg-card border border-input focus:ring-2 focus:ring-ring focus:border-ring"
               >
                 <SelectValue placeholder="Seleccionar Año" />
               </SelectTrigger>
@@ -62,14 +62,14 @@ export default function ReportSelection({
           <div className="w-full md:w-1/3 space-y-2">
             <Label
               htmlFor="reportDegree"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
+              className="text-sm font-medium text-foreground"
             >
               Grado
             </Label>
             <Select value={selectedDegree} onValueChange={onDegreeChange}>
               <SelectTrigger
                 id="reportDegree"
-                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="bg-card border border-input focus:ring-2 focus:ring-ring focus:border-ring"
               >
                 <SelectValue placeholder="Seleccionar Grado" />
               </SelectTrigger>
@@ -92,7 +92,7 @@ export default function ReportSelection({
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
                   <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-primary-foreground"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"

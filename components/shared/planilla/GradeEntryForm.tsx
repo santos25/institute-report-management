@@ -249,8 +249,8 @@ export default function GradeEntryForm({
             {loading ? (
               <div className="flex justify-center items-center py-16">
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">
                     Cargando calificaciones...
                   </p>
                 </div>
@@ -258,20 +258,20 @@ export default function GradeEntryForm({
             ) : (
               <div className="space-y-6">
                 {/* Table */}
-                <div className="overflow-x-auto rounded-lg border bg-white dark:bg-gray-800">
+                <div className="overflow-x-auto rounded-lg border bg-card">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-gray-50 dark:bg-gray-900 border-b">
-                        <TableHead className="w-[60%] font-bold px-4 py-2	 text-gray-700 dark:text-gray-300">
+                      <TableRow className="bg-muted border-b">
+                        <TableHead className="w-[60%] font-bold px-4 py-2 text-foreground">
                           Estudiante
                         </TableHead>
-                        <TableHead className="w-[30%] font-bold px-4 py-2 text-gray-700 dark:text-gray-300">
+                        <TableHead className="w-[30%] font-bold px-4 py-2 text-foreground">
                           Observación General
                         </TableHead>
-                        <TableHead className="font-bold w-[5%] px-4 py-2 text-center text-gray-700 dark:text-gray-300">
+                        <TableHead className="font-bold w-[5%] px-4 py-2 text-center text-foreground">
                           Nota
                         </TableHead>
-                        <TableHead className="font-bold w-[5%] px-4 py-2 text-center text-gray-700 dark:text-gray-300">
+                        <TableHead className="font-bold w-[5%] px-4 py-2 text-center text-foreground">
                           DS
                         </TableHead>
                       </TableRow>
@@ -282,16 +282,16 @@ export default function GradeEntryForm({
                         .map((student) => (
                           <TableRow
                             key={student.id}
-                            className="border-b hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+                            className="border-b hover:bg-azul-50 transition-colors"
                           >
                             <TableCell className="w-[60%] p-4 align-bottom">
                               <div className="flex items-center gap-3 mb-3">
-                                <div className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                                <div className="font-bold text-foreground text-sm">
                                   {student.name}
                                 </div>
                               </div>
                               <div className="relative">
-                                <label className="absolute -top-2 left-3 bg-white dark:bg-gray-800 px-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                <label className="absolute -top-2 left-3 bg-card px-1 text-xs font-medium text-muted-foreground">
                                   Logros del estudiante
                                 </label>
                                 <Textarea
@@ -303,13 +303,13 @@ export default function GradeEntryForm({
                                       e.target.value
                                     )
                                   }
-                                  className="min-h-[120px] w-full whitespace-pre-wrap border-gray-300 dark:border-gray-700 rounded-md pt-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  className="min-h-[120px] w-full whitespace-pre-wrap border-input rounded-md pt-3 focus:ring-2 focus:ring-ring focus:border-ring"
                                 />
                               </div>
                             </TableCell>
                             <TableCell className="w-[30%] p-4 align-bottom">
                               <div className="relative">
-                                <label className="absolute -top-2 left-3 bg-white dark:bg-gray-800 px-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                <label className="absolute -top-2 left-3 bg-card px-1 text-xs font-medium text-muted-foreground">
                                   Observación general
                                 </label>
                                 <Textarea
@@ -321,7 +321,7 @@ export default function GradeEntryForm({
                                       e.target.value
                                     )
                                   }
-                                  className="min-h-[120px] w-full whitespace-pre-wrap border-gray-300 dark:border-gray-700 rounded-md pt-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                  className="min-h-[120px] w-full whitespace-pre-wrap border-input rounded-md pt-3 focus:ring-2 focus:ring-coral-500 focus:border-coral-500"
                                 />
                               </div>
                             </TableCell>
@@ -340,9 +340,9 @@ export default function GradeEntryForm({
                                       e.target.value
                                     )
                                   }
-                                  className="w-16 text-center font-bold text-lg border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  className="w-16 text-center font-bold text-lg border-input focus:ring-2 focus:ring-ring focus:border-ring"
                                 />
-                                <span className="block text-xs text-gray-500 mt-1">
+                                <span className="block text-xs text-muted-foreground mt-1">
                                   /5.0
                                 </span>
                               </div>
@@ -363,7 +363,7 @@ export default function GradeEntryForm({
                                     );
                                   } else {
                                     return (
-                                      <span className="text-gray-400 text-sm">
+                                      <span className="text-muted-foreground text-sm">
                                         -
                                       </span>
                                     );
@@ -387,7 +387,7 @@ export default function GradeEntryForm({
               >
                 {saving ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
                     <span>Guardando...</span>
                   </div>
                 ) : (
@@ -399,9 +399,9 @@ export default function GradeEntryForm({
         ) : (
           <CardContent className="py-16">
             <div className="flex flex-col items-center justify-center text-center space-y-4">
-              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
                 <svg
-                  className="w-8 h-8 text-gray-400"
+                  className="w-8 h-8 text-muted-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -415,10 +415,10 @@ export default function GradeEntryForm({
                 </svg>
               </div>
               <div className="max-w-md">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="text-lg font-medium text-foreground mb-2">
                   Seleccione una asignatura
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-muted-foreground">
                   Elija una asignatura del menú desplegable para comenzar a
                   ingresar calificaciones y observaciones para los estudiantes.
                 </p>

@@ -9,7 +9,7 @@ type StudentReportCardProps = {
 
 const StudentReportCard: React.FC<StudentReportCardProps> = ({ student }) => {
   return (
-    <div className="flex items-center gap-2 p-3 border rounded-md bg-slate-50">
+    <div className="flex items-center gap-2 p-3 border rounded-md bg-muted">
       <div>
         <h3 className="font-semibold">{student.name}</h3>
       </div>

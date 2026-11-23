@@ -18,15 +18,15 @@ const BoletinPrint = ({
   className?: string;
 }) => {
   return (
-    <div ref={printRef} className={`boletin-sheet max-w-4xl mx-auto bg-white ${className}`}>
+    <div ref={printRef} className={`boletin-sheet max-w-4xl mx-auto bg-card ${className}`}>
       <style>{`
         @media print {
           @page {
             margin: 3.5rem 1.5rem 2.5rem 1.5rem;
-            background: white;
+            background: var(--card);
           }
           body {
-            background: white !important;
+            background: var(--card) !important;
           }
           
           /* Hide browser print headers and footers */
@@ -69,37 +69,37 @@ const BoletinPrint = ({
 
           {/* Grading Scale Table - Positioned to the right */}
           <div className="absolute right-0 top-10">
-            <table className="border border-gray-800 text-xs">
+            <table className="border border-tinta-800 text-xs">
               <tbody>
                 <tr>
-                  <td className="border border-gray-800 px-1 py-0.5 font-bold">
+                  <td className="border border-tinta-800 px-1 py-0.5 font-bold">
                     BAJO
                   </td>
-                  <td className="border border-gray-800 px-1 py-0.5">
+                  <td className="border border-tinta-800 px-1 py-0.5">
                     1,0 - 2,9
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-gray-800 px-1 py-0.5 font-bold">
+                  <td className="border border-tinta-800 px-1 py-0.5 font-bold">
                     BÁSICO
                   </td>
-                  <td className="border border-gray-800 px-1 py-0.5">
+                  <td className="border border-tinta-800 px-1 py-0.5">
                     3,0 - 3,9
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-gray-800 px-1 py-0.5 font-bold">
+                  <td className="border border-tinta-800 px-1 py-0.5 font-bold">
                     ALTO
                   </td>
-                  <td className="border border-gray-800 px-1 py-0.5">
+                  <td className="border border-tinta-800 px-1 py-0.5">
                     4,0 - 4,5
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-gray-800 px-1 py-0.5 font-bold">
+                  <td className="border border-tinta-800 px-1 py-0.5 font-bold">
                     SUPERIOR
                   </td>
-                  <td className="border border-gray-800 px-1 py-0.5">
+                  <td className="border border-tinta-800 px-1 py-0.5">
                     4,6 - 5,0
                   </td>
                 </tr>
@@ -122,11 +122,11 @@ const BoletinPrint = ({
         </div>
 
         {/* Student Information */}
-        <div className="border border-gray-400 mb-2">
+        <div className="border border-tinta-400 mb-2">
           <table className="w-full text-xs">
             <tbody>
               <tr>
-                <td className="border-b border-gray-400 px-2 py-1">
+                <td className="border-b border-tinta-400 px-2 py-1">
                   <span className="font-bold">NOMBRES Y APELLIDOS: </span>
                   {report?.student.name}
                 </td>
@@ -137,11 +137,11 @@ const BoletinPrint = ({
           <table className="w-full text-xs">
             <tbody>
               <tr>
-                <td className="border-r border-gray-400 px-2 py-1">
+                <td className="border-r border-tinta-400 px-2 py-1">
                   <span className="font-bold">GRADO: </span>{" "}
                   <span className="uppercase">{report?.degree?.name}</span>
                 </td>
-                <td className="border-r border-gray-400 px-2 py-1">
+                <td className="border-r border-tinta-400 px-2 py-1">
                   <span className="font-bold">DOCENTE: </span>
                   {
                     DOCENTES_BY_GRADE[
