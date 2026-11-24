@@ -1,16 +1,20 @@
 import Image from "next/image";
 
-// Signatures component
-const ReportSignatures: React.FC = () => (
-  <div className="flex justify-between px-12 items-end align-top">
+// Signatures component. `compact` keeps the same firmas in a shorter block.
+const ReportSignatures = ({ compact = false }: { compact?: boolean }) => (
+  <div
+    className={`flex items-end justify-between align-top ${compact ? "px-8" : "px-12"}`}
+  >
     <div className="text-center">
-      <div className="mb-1 h-16 flex items-end justify-center">
+      <div
+        className={`mb-1 flex items-end justify-center ${compact ? "h-12" : "h-16"}`}
+      >
         <Image
           src="/images/firma-madre.png"
           alt="Firma Rectora"
           width={120}
           height={60}
-          className="mx-auto"
+          className={compact ? "mx-auto h-10 w-auto" : "mx-auto"}
           priority
           unoptimized
         />
