@@ -31,7 +31,10 @@ export default function GradeEntrySelection({
   onSearch: () => void;
   loading: boolean;
 }) {
-  const planillaPeriods = periods.filter((p) => p.number >= 1 && p.number <= 3);
+  const planillaPeriods = periods.filter(
+    (period) =>
+      (period.number >= 1 && period.number <= 3) || period.id === selectedPeriod
+  );
 
   return (
     <Card className="mb-6 border rounded-lg shadow-sm">

@@ -120,6 +120,17 @@ export const Header = () => {
             >
               Boletines
             </Link>
+            <Link
+              href="/avance"
+              className={cn(
+                "rounded-full px-3 py-2 text-sm",
+                pathname.startsWith("/avance")
+                  ? "bg-azul-50 font-medium text-azul-700"
+                  : "text-tinta-600 hover:text-azul-700"
+              )}
+            >
+              Avance
+            </Link>
           </nav>
         )}
 
@@ -207,6 +218,13 @@ export const Header = () => {
                         className="rounded-xl px-3 py-3 text-base text-tinta hover:bg-azul-50"
                       >
                         Boletines
+                      </Link>
+                      <Link
+                        href="/avance"
+                        onClick={() => setOpen(false)}
+                        className="rounded-xl px-3 py-3 text-base text-tinta hover:bg-azul-50"
+                      >
+                        Avance
                       </Link>
                     </>
                   )}
