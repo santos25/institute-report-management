@@ -1,42 +1,30 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { GUARDIAN_SESSION_COOKIE, verifyGuardianToken } from "@/lib/auth/guardian-token";
+import { decideRequestAccess } from "@/lib/auth/routes";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/token";
-
-function isPortalPath(pathname: string) {
-  return (
-    pathname === "/planillas" ||
-    pathname.startsWith("/planillas/") ||
-    pathname === "/boletines" ||
-    pathname.startsWith("/boletines/") ||
-    pathname === "/avance" ||
-    pathname.startsWith("/avance/") ||
-    pathname === "/estudiantes" ||
-    pathname.startsWith("/estudiantes/") ||
-    pathname === "/usuarios" ||
-    pathname.startsWith("/usuarios/")
-  );
-}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const secret = process.env.AUTH_SECRET;
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  const session =
-    secret && token ? await verifySessionToken(token, secret) : null;
+  const staffToken = request.cookies.get(SESSION_COOKIE)?.value;
+  const guardianToken = request.cookies.get(GUARDIAN_SESSION_COOKIE)?.value;
 
-  if (pathname === "/login" && session) {
-    return NextResponse.redirect(new URL("/planillas", request.url));
-  }
+  const staff =
+    secret && staffToken ? await verifySessionToken(staffToken, secret) : null;
+  const guardian =
+    secret && guardianToken
+      ? await verifyGuardianToken(guardianToken, secret)
+      : null;
 
-  if (isPortalPath(pathname) && !session) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  const decision = decideRequestAccess({
+    pathname,
+    staffRole: staff?.role ?? null,
+    guardianAuthenticated: Boolean(guardian),
+  });
 
-  if (
-    (pathname === "/usuarios" || pathname.startsWith("/usuarios/")) &&
-    session?.role !== "ADMIN"
-  ) {
-    return NextResponse.redirect(new URL("/planillas", request.url));
+  if (decision.type === "redirect") {
+    return NextResponse.redirect(new URL(decision.to, request.url));
   }
 
   return NextResponse.next();
@@ -55,5 +43,9 @@ export const config = {
     "/estudiantes/:path*",
     "/usuarios",
     "/usuarios/:path*",
+    "/acudientes",
+    "/acudientes/:path*",
+    "/familias",
+    "/familias/:path*",
   ],
 };

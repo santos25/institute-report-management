@@ -40,11 +40,15 @@ model Student {
   name           String
   degreeId       String
   identification String               @default("")
+  guardianId     String?
   degree         Degree               @relation(fields: [degreeId], references: [id])
+  guardian       Guardian?            @relation(fields: [guardianId], references: [id], onDelete: SetNull)
   grades         StudentGrade[]
   observations   StudentObservation[]
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
+
+  @@index([guardianId])
 }
 
 model Period {
@@ -69,6 +73,32 @@ model User {
   degrees   Degree[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Cuenta de familia, separada del personal (User). El usuario de ingreso es la cédula.
+model Guardian {
+  id                 String              @id @default(cuid())
+  identification     String              @unique
+  name               String
+  phone              String?
+  password           String
+  mustChangePassword Boolean             @default(true)
+  failedAttempts     Int                 @default(0)
+  lockedUntil        DateTime?
+  students           Student[]
+  accessLogs         GuardianAccessLog[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model GuardianAccessLog {
+  id         String   @id @default(cuid())
+  guardianId String
+  action     String
+  guardian   Guardian @relation(fields: [guardianId], references: [id], onDelete: Restrict)
+  createdAt  DateTime @default(now())
+
+  @@index([guardianId])
 }
 
 // Student grades for each subject and period
