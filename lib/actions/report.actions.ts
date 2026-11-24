@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/db/prisma";
+import { assertDegreeAccess, requireActionUser } from "@/lib/auth/access";
 
 export interface StudentReport {
   student: {
@@ -26,6 +27,9 @@ export async function getStudentReportsByDegreeAndYear(
   year: string
 ): Promise<StudentReport[]> {
   try {
+    const user = await requireActionUser();
+    assertDegreeAccess(user, degreeId);
+
     // Convert year to integer
     const yearInt = parseInt(year);
     
