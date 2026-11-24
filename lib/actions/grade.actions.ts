@@ -14,7 +14,6 @@ interface GradeData {
   periodId: string;
   value: number;
   achievements?: string;
-  observation?: string;
 }
 
 export async function saveGrades(grades: GradeData[]) {
@@ -28,7 +27,6 @@ export async function saveGrades(grades: GradeData[]) {
     // Start a transaction for all operations
     return await prisma.$transaction(async (tx) => {
       const savedGrades = [];
-      const savedObservations = [];
 
       // Get the first periodId from the batch (all should be the same)
       const periodId = grades[0]?.periodId;
@@ -40,9 +38,8 @@ export async function saveGrades(grades: GradeData[]) {
         };
       }
 
-      // Process each grade entry
+      // Process each grade entry. Las observaciones se guardan aparte.
       for (const grade of grades) {
-        // Save the grade for this specific year's period
         const savedGrade = await tx.studentGrade.upsert({
           where: {
             studentId_subjectId_periodId: {
@@ -65,39 +62,16 @@ export async function saveGrades(grades: GradeData[]) {
         });
 
         savedGrades.push(savedGrade);
-
-        // If observation is provided, also save it
-        if (grade.observation) {
-          const savedObservation = await tx.studentObservation.upsert({
-            where: {
-              studentId_periodId: {
-                studentId: grade.studentId,
-                periodId: grade.periodId,
-              },
-            },
-            update: {
-              content: grade.observation,
-            },
-            create: {
-              studentId: grade.studentId,
-              periodId: grade.periodId,
-              content: grade.observation,
-            },
-          });
-
-          savedObservations.push(savedObservation);
-        }
       }
 
       return {
         success: true,
         count: savedGrades.length,
         grades: savedGrades,
-        observations: savedObservations,
       };
     });
   } catch (error) {
-    console.error("Error saving grades and observations:", error);
+    console.error("Error saving grades:", error);
     return { success: false, error: (error as Error).message };
   }
 }
@@ -287,35 +261,15 @@ export async function getGradesAndObservationsBySubjectPeriod(
       },
     });
 
-    // Get all observations for these students in this period
-    // Also filter by the year of the period
-    const observations = await prisma.studentObservation.findMany({
-      where: {
-        studentId: {
-          in: studentIds,
-        },
-        periodId: periodId,
-        period: {
-          year: periodYear,
-        },
-      },
-    });
-
-    // Create a map of student ID to their grade, achievements, and observation
     const studentData = students.reduce(
       (acc, student) => {
         const grade = grades.find((g) => g.studentId === student.id);
-        const observation = observations.find(
-          (o) => o.studentId === student.id
-        );
 
         acc[student.id] = {
           student: student,
           grade: grade ? grade.grade : 0,
           gradeId: grade ? grade.id : null,
           achievements: grade ? grade.achievements || "" : "",
-          observation: observation ? observation.content : "",
-          observationId: observation ? observation.id : null,
         };
 
         return acc;
@@ -327,8 +281,6 @@ export async function getGradesAndObservationsBySubjectPeriod(
           grade: number;
           gradeId: string | null;
           achievements: string;
-          observation: string;
-          observationId: string | null;
         }
       >
     );
