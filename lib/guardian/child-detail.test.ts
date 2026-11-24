@@ -1,18 +1,20 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildChildDetail, childDetailAction } from "./child-detail";
+import { buildChildDetail, childBoletinAction, childDetailAction, childDetailToReport } from "./child-detail";
 
 const studentA = {
   id: "est-a",
   name: "NIÑO A",
   guardianId: "gua-a",
+  degreeId: "grado-1",
   degreeName: "PRIMERO",
 };
 
 const periods = [
-  { id: "p1", number: 1, year: 2026 },
-  { id: "p2", number: 2, year: 2026 },
-  { id: "old", number: 1, year: 2025 },
+  { id: "p1", number: 1, year: 2026, published: true },
+  { id: "p2", number: 2, year: 2026, published: true },
+  { id: "hidden", number: 3, year: 2026, published: false },
+  { id: "old", number: 1, year: 2025, published: true },
 ];
 
 const grades = [
@@ -48,6 +50,14 @@ const grades = [
     grade: 0,
     achievements: "Sin nota.",
   },
+  {
+    studentId: "est-a",
+    periodId: "hidden",
+    subjectId: "mat",
+    subjectName: "MATEMÁTICAS",
+    grade: 5,
+    achievements: "Periodo sin publicar.",
+  },
 ];
 
 const observations = [
@@ -55,6 +65,7 @@ const observations = [
   { studentId: "est-b", periodId: "p1", content: "Observación ajena." },
   { studentId: "est-a", periodId: "old", content: "Observación de 2025." },
   { studentId: "est-a", periodId: "p2", content: "Solo observación." },
+  { studentId: "est-a", periodId: "hidden", content: "Observación sin publicar." },
 ];
 
 describe("detalle del hijo", () => {
@@ -85,7 +96,30 @@ describe("detalle del hijo", () => {
     assert.equal(JSON.stringify(detail).includes("NIÑO B"), false);
     assert.equal(JSON.stringify(detail).includes("ajena"), false);
     assert.equal(JSON.stringify(detail).includes("Año anterior"), false);
+    assert.equal(JSON.stringify(detail).includes("sin publicar"), false);
     assert.equal(JSON.stringify(detail).includes("promedio"), false);
+  });
+
+  it("un periodo del año actual que no está publicado no aparece", () => {
+    const detail = buildChildDetail({
+      guardianId: "gua-a",
+      year: 2026,
+      student: studentA,
+      periods,
+      grades,
+      observations,
+    });
+    assert.ok(detail);
+    assert.deepEqual(
+      detail.periods.map((period) => period.number),
+      [1, 2]
+    );
+    const report = childDetailToReport(detail);
+    assert.deepEqual(
+      report.periodGrades.map((period) => period.periodNumber),
+      [1, 2]
+    );
+    assert.equal(JSON.stringify(report).includes("sin publicar"), false);
   });
 
   it("un estudiante de otro acudiente no devuelve datos", () => {
@@ -127,5 +161,6 @@ describe("detalle del hijo", () => {
 
   it("la vista queda registrada con el id del propio hijo", () => {
     assert.equal(childDetailAction("est-a"), "VIEW_CHILD:est-a");
+    assert.equal(childBoletinAction("est-a"), "VIEW_BOLETIN:est-a");
   });
 });

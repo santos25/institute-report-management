@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
+import PublishPeriodControl from "@/components/shared/avance/PublishPeriodControl";
 import { Card, CardContent } from "@/components/ui/card";
 import { planillaHref, type PeriodProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
@@ -23,8 +24,10 @@ function pendingLabel(count: number): string {
 
 export default function PeriodProgressBoard({
   progress,
+  canPublish = false,
 }: {
   progress: PeriodProgress;
+  canPublish?: boolean;
 }) {
   const { year, periods, period, summary, degrees } = progress;
 
@@ -63,6 +66,14 @@ export default function PeriodProgressBoard({
           </nav>
         )}
       </div>
+
+      {canPublish && period ? (
+        <PublishPeriodControl
+          periodId={period.id}
+          periodNumber={period.number}
+          published={period.visibleToGuardians}
+        />
+      ) : null}
 
       {!period ? (
         <Card className="mt-6">

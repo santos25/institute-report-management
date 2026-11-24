@@ -19,9 +19,11 @@ function firstParam(value: string | string[] | undefined): string | undefined {
 }
 
 export default async function AvancePage({ searchParams }: AvancePageProps) {
-  await requireUser();
+  const user = await requireUser();
   const params = await searchParams;
   const progress = await getPeriodProgress(firstParam(params.periodo));
 
-  return <PeriodProgressBoard progress={progress} />;
+  return (
+    <PeriodProgressBoard progress={progress} canPublish={user.role === "ADMIN"} />
+  );
 }

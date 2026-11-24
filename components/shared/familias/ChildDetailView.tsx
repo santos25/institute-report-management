@@ -40,10 +40,17 @@ export default function ChildDetailView({ detail }: { detail: ChildDetail }) {
       <p className="mt-1 text-sm text-muted-foreground">
         {detail.student.degreeName} · Año {detail.year}
       </p>
+      <Link
+        href={`/familias/hijos/${detail.student.id}/boletin`}
+        prefetch={false}
+        className="mt-3 inline-block text-sm font-semibold text-azul-700 underline-offset-4 hover:underline"
+      >
+        Ver boletín
+      </Link>
 
       {detail.periods.length === 0 ? (
         <p className="mt-6 rounded-2xl border border-border bg-card px-4 py-6 text-sm text-tinta">
-          El colegio todavía no ha registrado notas ni observaciones de este año.
+          Cuando el colegio publique un periodo, verás aquí las notas, los logros y la observación.
         </p>
       ) : (
         <div className="mt-6 space-y-6">
