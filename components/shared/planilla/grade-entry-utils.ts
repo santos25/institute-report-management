@@ -1,20 +1,17 @@
 export type GradeSnapshot = {
   grades: Record<string, string>;
   achievements: Record<string, string>;
-  observations: Record<string, string>;
 };
 
 export const EMPTY_GRADE_SNAPSHOT: GradeSnapshot = {
   grades: {},
   achievements: {},
-  observations: {},
 };
 
 export function cloneSnapshot(snapshot: GradeSnapshot): GradeSnapshot {
   return {
     grades: { ...snapshot.grades },
     achievements: { ...snapshot.achievements },
-    observations: { ...snapshot.observations },
   };
 }
 
@@ -32,12 +29,6 @@ export function countFieldChanges(
     if (
       (current.achievements[studentId] ?? "") !==
       (baseline.achievements[studentId] ?? "")
-    ) {
-      changes += 1;
-    }
-    if (
-      (current.observations[studentId] ?? "") !==
-      (baseline.observations[studentId] ?? "")
     ) {
       changes += 1;
     }

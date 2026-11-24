@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -19,11 +21,15 @@ export type SubjectNavItem = {
   active: boolean;
   filled: number | null;
   total: number;
+  keepCount?: boolean;
+  description?: string;
 };
 
 type SubjectNavProps = {
   label: string;
   items: SubjectNavItem[];
+  footerLabel?: string;
+  footerItems?: SubjectNavItem[];
   disabled?: boolean;
   onSelect: (subjectId: string) => void;
 };
@@ -34,7 +40,7 @@ function progressDescription(item: SubjectNavItem): string {
 }
 
 function ProgressMark({ item }: { item: SubjectNavItem }) {
-  if (item.complete) {
+  if (item.complete && !item.keepCount) {
     return (
       <span className="inline-flex shrink-0 items-center">
         <Check
@@ -48,30 +54,89 @@ function ProgressMark({ item }: { item: SubjectNavItem }) {
   }
 
   return (
-    <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+    <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium tabular-nums text-muted-foreground">
+      {item.complete ? (
+        <Check
+          className="size-4 text-hoja-700"
+          strokeWidth={3}
+          aria-hidden
+        />
+      ) : null}
       {item.progressText}
     </span>
   );
 }
 
+function itemLabel(item: SubjectNavItem): string {
+  return item.description ?? `${item.name}, ${progressDescription(item)}`;
+}
+
+function NavButton({
+  item,
+  disabled,
+  onSelect,
+}: {
+  item: SubjectNavItem;
+  disabled: boolean;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-current={item.active ? "page" : undefined}
+      aria-label={itemLabel(item)}
+      disabled={disabled}
+      onClick={() => onSelect(item.id)}
+      className={cn(
+        "flex w-full items-center gap-2 border-l-[3px] py-2.5 pr-3 pl-2.5 text-left text-sm transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+        "disabled:cursor-not-allowed disabled:opacity-60",
+        item.active
+          ? "border-azul-500 bg-azul-50 font-semibold text-tinta dark:bg-azul-900/70 dark:text-crema"
+          : "border-transparent text-foreground hover:bg-muted/80"
+      )}
+    >
+      <span className="min-w-0 flex-1 leading-snug">{item.name}</span>
+      <ProgressMark item={item} />
+    </button>
+  );
+}
+
+function SelectOptions({ items }: { items: SubjectNavItem[] }) {
+  return items.map((item) => (
+    <SelectItem key={item.id} value={item.id}>
+      <span className="flex w-full items-center justify-between gap-3 pr-6">
+        <span className="truncate">{item.name}</span>
+        <ProgressMark item={item} />
+      </span>
+    </SelectItem>
+  ));
+}
+
 export default function SubjectNav({
   label,
   items,
+  footerLabel,
+  footerItems = [],
   disabled = false,
   onSelect,
 }: SubjectNavProps) {
-  const activeId = items.find((item) => item.active)?.id ?? "";
+  const activeItem =
+    [...items, ...footerItems].find((item) => item.active) ?? null;
+  const activeId = activeItem?.id ?? "";
+  const mobileLabel =
+    footerLabel && footerItems.some((item) => item.active) ? footerLabel : label;
 
   return (
     <div className="min-w-0 lg:border-r lg:border-border">
       <div className="px-4 py-3 sm:px-6 lg:hidden">
         <Label htmlFor="subject-nav-select" className="mb-2 text-sm font-bold">
-          {label}
+          {mobileLabel}
         </Label>
         <Select
           value={activeId || undefined}
           onValueChange={onSelect}
-          disabled={disabled || items.length === 0}
+          disabled={disabled || (items.length === 0 && footerItems.length === 0)}
         >
           <SelectTrigger
             id="subject-nav-select"
@@ -80,14 +145,16 @@ export default function SubjectNav({
             <SelectValue placeholder="Seleccionar" />
           </SelectTrigger>
           <SelectContent>
-            {items.map((item) => (
-              <SelectItem key={item.id} value={item.id}>
-                <span className="flex w-full items-center justify-between gap-3 pr-6">
-                  <span className="truncate">{item.name}</span>
-                  <ProgressMark item={item} />
-                </span>
-              </SelectItem>
-            ))}
+            <SelectGroup>
+              <SelectLabel>{label}</SelectLabel>
+              <SelectOptions items={items} />
+            </SelectGroup>
+            {footerItems.length > 0 ? (
+              <SelectGroup>
+                <SelectLabel>{footerLabel}</SelectLabel>
+                <SelectOptions items={footerItems} />
+              </SelectGroup>
+            ) : null}
           </SelectContent>
         </Select>
       </div>
@@ -102,27 +169,22 @@ export default function SubjectNav({
         <ul>
           {items.map((item) => (
             <li key={item.id}>
-              <button
-                type="button"
-                aria-current={item.active ? "page" : undefined}
-                aria-label={`${item.name}, ${progressDescription(item)}`}
-                disabled={disabled}
-                onClick={() => onSelect(item.id)}
-                className={cn(
-                  "flex w-full items-center gap-2 border-l-[3px] py-2.5 pr-3 pl-2.5 text-left text-sm transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-                  "disabled:cursor-not-allowed disabled:opacity-60",
-                  item.active
-                    ? "border-azul-500 bg-azul-50 font-semibold text-tinta dark:bg-azul-900/70 dark:text-crema"
-                    : "border-transparent text-foreground hover:bg-muted/80"
-                )}
-              >
-                <span className="min-w-0 flex-1 leading-snug">{item.name}</span>
-                <ProgressMark item={item} />
-              </button>
+              <NavButton item={item} disabled={disabled} onSelect={onSelect} />
             </li>
           ))}
         </ul>
+        {footerItems.length > 0 ? (
+          <div className="mt-2 border-t border-border pt-2">
+            <p className="px-3 pb-2 pt-1 text-sm font-bold">{footerLabel}</p>
+            <ul>
+              {footerItems.map((item) => (
+                <li key={item.id}>
+                  <NavButton item={item} disabled={disabled} onSelect={onSelect} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </nav>
     </div>
   );

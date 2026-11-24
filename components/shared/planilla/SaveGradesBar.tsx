@@ -11,12 +11,16 @@ import {
 type SaveGradesBarProps = {
   state: SaveBarState;
   disabled?: boolean;
+  saveLabel?: string;
+  regionLabel?: string;
   onSave: () => void;
 };
 
 export default function SaveGradesBar({
   state,
   disabled = false,
+  saveLabel = "Guardar Calificaciones",
+  regionLabel = "Guardar calificaciones",
   onSave,
 }: SaveGradesBarProps) {
   const label = getSaveBarLabel(state);
@@ -24,7 +28,7 @@ export default function SaveGradesBar({
   return (
     <div
       role="region"
-      aria-label="Guardar calificaciones"
+      aria-label={regionLabel}
       data-save-state={state.kind}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lg backdrop-blur-md"
     >
@@ -58,7 +62,7 @@ export default function SaveGradesBar({
           disabled={disabled}
           className="w-full font-medium shadow-sm sm:w-auto"
         >
-          Guardar Calificaciones
+          {saveLabel}
         </Button>
       </div>
     </div>

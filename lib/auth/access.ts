@@ -42,6 +42,19 @@ export function assertDegreeAccess(user: ActionUser, degreeId: string) {
   }
 }
 
+/**
+ * El modelo no tiene directora de grupo: el rol es ADMIN o TEACHER y el
+ * grado se asigna en _DegreeToUser. Mientras no exista ese concepto, editan
+ * las observaciones el administrador y las docentes asignadas al grado.
+ */
+export function canEditDegreeObservations(
+  user: ActionUser,
+  degreeId: string
+): boolean {
+  if (user.role === "ADMIN") return true;
+  return user.degreeIds.includes(degreeId);
+}
+
 export async function assertStudentAccess(user: ActionUser, studentId: string) {
   if (user.role === "ADMIN") return;
 

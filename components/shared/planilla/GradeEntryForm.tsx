@@ -27,8 +27,13 @@ import { Subject } from "@prisma/client";
 import { getGradesAndObservationsBySubjectPeriod } from "@/lib/actions/grade.actions";
 import { getGradeCountsByDegreePeriod } from "@/lib/actions/grade.actions";
 import { saveGrades } from "@/lib/actions/grade.actions";
+import { getObservationSummary } from "@/lib/actions/observation.actions";
 import { PREESCOLAR_LEVEL } from "@/lib/constant";
+import { OBSERVATIONS_NAV_ID } from "@/lib/observation-draft";
 import { calculateDS } from "@/lib/utils";
+import ObservationEntry, {
+  type ObservationEntryHandle,
+} from "@/components/shared/planilla/ObservationEntry";
 import SaveGradesBar from "@/components/shared/planilla/SaveGradesBar";
 import SubjectNav from "@/components/shared/planilla/SubjectNav";
 import {
@@ -71,25 +76,34 @@ export default function GradeEntryForm({
   students,
   onRequestSubjectChange,
 }: GradeEntryFormProps) {
+  const [panel, setPanel] = useState<"subject" | "observations">("subject");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [grades, setGrades] = useState<Record<string, string>>({});
   const [achievements, setAchievements] = useState<Record<string, string>>({});
-  const [observations, setObservations] = useState<Record<string, string>>({});
   const [baseline, setBaseline] = useState<GradeSnapshot>(EMPTY_GRADE_SNAPSHOT);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [observationDirty, setObservationDirty] = useState(false);
+  const [observationSaving, setObservationSaving] = useState(false);
   const [progress, setProgress] = useState<{
     status: "loading" | "ready" | "error";
     counts: Record<string, number>;
   }>({ status: "loading", counts: {} });
+  const [observationProgress, setObservationProgress] = useState<{
+    status: "loading" | "ready" | "error";
+    filled: number | null;
+  }>({ status: "loading", filled: null });
 
   const requestSeq = useRef(0);
   const saveInFlight = useRef<Promise<boolean> | null>(null);
   const selectedSubjectRef = useRef(selectedSubject);
+  const panelRef = useRef(panel);
   const savingRef = useRef(saving);
   const degreeStudentIdsRef = useRef<string[]>([]);
+  const observationRef = useRef<ObservationEntryHandle>(null);
+  const observationDraftRef = useRef(false);
 
   const degreeStudentIds = useMemo(
     () =>
@@ -101,16 +115,12 @@ export default function GradeEntryForm({
 
   degreeStudentIdsRef.current = degreeStudentIds;
   selectedSubjectRef.current = selectedSubject;
+  panelRef.current = panel;
   savingRef.current = saving;
 
   const changeCount = useMemo(
-    () =>
-      countFieldChanges(
-        { grades, achievements, observations },
-        baseline,
-        degreeStudentIds
-      ),
-    [grades, achievements, observations, baseline, degreeStudentIds]
+    () => countFieldChanges({ grades, achievements }, baseline, degreeStudentIds),
+    [grades, achievements, baseline, degreeStudentIds]
   );
 
   const changeCountRef = useRef(changeCount);
@@ -120,7 +130,6 @@ export default function GradeEntryForm({
     const next = cloneSnapshot(snapshot);
     setGrades(next.grades);
     setAchievements(next.achievements);
-    setObservations(next.observations);
     setBaseline(cloneSnapshot(snapshot));
   }, []);
 
@@ -140,6 +149,7 @@ export default function GradeEntryForm({
 
   useEffect(() => {
     let cancelled = false;
+    observationDraftRef.current = false;
 
     getGradeCountsByDegreePeriod(degree.id, period.id).then((result) => {
       if (cancelled) return;
@@ -156,13 +166,30 @@ export default function GradeEntryForm({
       }));
     });
 
+    getObservationSummary(degree.id, period.id).then((result) => {
+      if (cancelled || observationDraftRef.current) return;
+      if (!result.success) {
+        setObservationProgress((current) =>
+          observationDraftRef.current
+            ? current
+            : { status: "error", filled: current.filled }
+        );
+        return;
+      }
+      setObservationProgress((current) =>
+        observationDraftRef.current
+          ? current
+          : { status: "ready", filled: result.filled }
+      );
+    });
+
     return () => {
       cancelled = true;
     };
   }, [degree.id, period.id]);
 
   useEffect(() => {
-    if (changeCount === 0) return;
+    if (changeCount === 0 && !observationDirty) return;
 
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
@@ -171,7 +198,7 @@ export default function GradeEntryForm({
 
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [changeCount]);
+  }, [changeCount, observationDirty]);
 
   const loadSubject = useCallback(
     async (subjectId: string) => {
@@ -206,13 +233,11 @@ export default function GradeEntryForm({
         const next: GradeSnapshot = {
           grades: {},
           achievements: {},
-          observations: {},
         };
 
         Object.entries(result.data).forEach(([studentId, data]) => {
           next.grades[studentId] = data.grade ? data.grade.toString() : "";
           next.achievements[studentId] = data.achievements;
-          next.observations[studentId] = data.observation;
         });
 
         applySnapshot(next);
@@ -246,7 +271,6 @@ export default function GradeEntryForm({
 
       const savedGrades = { ...grades };
       const savedAchievements = { ...achievements };
-      const savedObservations = { ...observations };
       const studentIds = degreeStudentIds;
 
       const gradesToSave = studentIds
@@ -255,9 +279,7 @@ export default function GradeEntryForm({
             (savedGrades[studentId]?.trim() !== "" &&
               savedGrades[studentId] !== undefined) ||
             (savedAchievements[studentId]?.trim() !== "" &&
-              savedAchievements[studentId] !== undefined) ||
-            (savedObservations[studentId]?.trim() !== "" &&
-              savedObservations[studentId] !== undefined)
+              savedAchievements[studentId] !== undefined)
         )
         .map((studentId) => {
           let gradeValue = 0;
@@ -274,13 +296,12 @@ export default function GradeEntryForm({
             periodId: period.id,
             value: gradeValue,
             achievements: savedAchievements[studentId] || "",
-            observation: savedObservations[studentId] || "",
           };
         });
 
       if (gradesToSave.length === 0) {
         toast.error(
-          "No hay calificaciones, logros o observaciones para guardar",
+          "No hay calificaciones o logros para guardar",
           SAVE_TOAST
         );
         setSaveError(true);
@@ -296,7 +317,6 @@ export default function GradeEntryForm({
           const savedSnapshot: GradeSnapshot = {
             grades: savedGrades,
             achievements: savedAchievements,
-            observations: savedObservations,
           };
           setBaseline(cloneSnapshot(savedSnapshot));
           setSavedAt(new Date());
@@ -313,12 +333,9 @@ export default function GradeEntryForm({
         setSaveError(true);
         return false;
       } catch (error) {
-        console.error(
-          "Error saving grades, achievements, and observations:",
-          error
-        );
+        console.error("Error saving grades and achievements:", error);
         toast.error(
-          "Error al guardar las calificaciones, logros y observaciones",
+          "Error al guardar las calificaciones y logros",
           SAVE_TOAST
         );
         setSaveError(true);
@@ -339,23 +356,57 @@ export default function GradeEntryForm({
     achievements,
     degreeStudentIds,
     grades,
-    observations,
     period.id,
     rememberSubjectCount,
   ]);
 
+  const openView = useCallback(
+    (nextId: string) => {
+      if (savingRef.current || observationRef.current?.isSaving()) return;
+
+      if (nextId === OBSERVATIONS_NAV_ID) {
+        if (panelRef.current === "observations") return;
+        panelRef.current = "observations";
+        setPanel("observations");
+        return;
+      }
+
+      panelRef.current = "subject";
+      setPanel("subject");
+      void loadSubject(nextId);
+    },
+    [loadSubject]
+  );
+
   useImperativeHandle(
     ref,
     () => ({
-      save: handleSave,
-      revert: handleRevert,
-      changeSubject: (subjectId: string) => {
-        void loadSubject(subjectId);
+      save: () => {
+        if (panelRef.current === "observations") {
+          return observationRef.current?.save() ?? Promise.resolve(false);
+        }
+        return handleSave();
       },
-      hasUnsavedChanges: () => changeCountRef.current > 0,
-      isSaving: () => savingRef.current,
+      revert: () => {
+        if (panelRef.current === "observations") {
+          observationRef.current?.revert();
+          return;
+        }
+        handleRevert();
+      },
+      changeSubject: (subjectId: string) => {
+        openView(subjectId);
+      },
+      hasUnsavedChanges: () => {
+        if (panelRef.current === "observations") {
+          return observationRef.current?.hasUnsavedChanges() ?? false;
+        }
+        return changeCountRef.current > 0;
+      },
+      isSaving: () =>
+        savingRef.current || (observationRef.current?.isSaving() ?? false),
     }),
-    [handleRevert, handleSave, loadSubject]
+    [handleRevert, handleSave, openView]
   );
 
   const handleGradeChange = (studentId: string, value: string) => {
@@ -382,11 +433,6 @@ export default function GradeEntryForm({
     setAchievements((prev) => ({ ...prev, [studentId]: value }));
   };
 
-  const handleObservationChange = (studentId: string, value: string) => {
-    setSaveError(false);
-    setObservations((prev) => ({ ...prev, [studentId]: value }));
-  };
-
   const subjectLabel = PREESCOLAR_LEVEL.includes(degree.name)
     ? "DIMENSIONES"
     : "ÁREAS (ASIGNATURAS)";
@@ -394,7 +440,8 @@ export default function GradeEntryForm({
   const totalStudents = degreeStudentIds.length;
 
   const chipItems = subjects.map((subject) => {
-    const usesDraft = subject.id === selectedSubject && !loading;
+    const usesDraft =
+      panel === "subject" && subject.id === selectedSubject && !loading;
     const filled = usesDraft
       ? countStudentsWithGrade(grades, degreeStudentIds)
       : Object.prototype.hasOwnProperty.call(progress.counts, subject.id)
@@ -410,9 +457,44 @@ export default function GradeEntryForm({
       total: totalStudents,
       progressText: formatSubjectProgress(filled, totalStudents, progress.status),
       complete: isSubjectComplete(filled, totalStudents),
-      active: subject.id === selectedSubject,
+      active: panel === "subject" && subject.id === selectedSubject,
     };
   });
+
+  const observationFilled = observationProgress.filled;
+  const observationItem = {
+    id: OBSERVATIONS_NAV_ID,
+    name: "Observaciones generales",
+    filled: observationFilled,
+    total: totalStudents,
+    progressText: formatSubjectProgress(
+      observationFilled,
+      totalStudents,
+      observationProgress.status
+    ),
+    complete: isSubjectComplete(observationFilled, totalStudents),
+    active: panel === "observations",
+    keepCount: true,
+    description:
+      observationFilled == null
+        ? "Observaciones generales, cargando"
+        : `Observaciones generales, ${observationFilled} de ${totalStudents} con observación`,
+  };
+
+  const handleObservationFilled = useCallback((filled: number) => {
+    observationDraftRef.current = true;
+    setObservationProgress({ status: "ready", filled });
+  }, []);
+
+  const handleObservationDirty = useCallback((dirty: boolean) => {
+    setObservationDirty(dirty);
+  }, []);
+
+  const handleObservationSaving = useCallback((next: boolean) => {
+    setObservationSaving(next);
+  }, []);
+
+  const navDisabled = saving || observationSaving;
 
   const saveBarState = resolveSaveBarState({
     saving,
@@ -421,9 +503,11 @@ export default function GradeEntryForm({
     savedAt,
   });
 
+  const showGradeBar = panel === "subject" && Boolean(selectedSubject);
+
   return (
     <>
-      <Card className={selectedSubject ? "mb-32 gap-0" : "gap-0"}>
+      <Card className={showGradeBar || panel === "observations" ? "mb-32 gap-0" : "gap-0"}>
         <CardHeader className="pb-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
             <CardTitle className="flex flex-wrap items-center gap-2">
@@ -441,14 +525,31 @@ export default function GradeEntryForm({
           <SubjectNav
             label={subjectLabel}
             items={chipItems}
-            disabled={saving}
-            onSelect={(subjectId) => {
-              if (subjectId === selectedSubject || saving) return;
-              onRequestSubjectChange(subjectId);
+            footerLabel="OBSERVACIONES"
+            footerItems={[observationItem]}
+            disabled={navDisabled}
+            onSelect={(nextId) => {
+              if (navDisabled) return;
+              if (nextId === OBSERVATIONS_NAV_ID) {
+                if (panel === "observations") return;
+                onRequestSubjectChange(nextId);
+                return;
+              }
+              if (panel === "subject" && nextId === selectedSubject) return;
+              onRequestSubjectChange(nextId);
             }}
           />
 
-          {selectedSubject ? (
+          {panel === "observations" ? (
+            <ObservationEntry
+              ref={observationRef}
+              degreeId={degree.id}
+              periodId={period.id}
+              onFilledChange={handleObservationFilled}
+              onDirtyChange={handleObservationDirty}
+              onSavingChange={handleObservationSaving}
+            />
+          ) : selectedSubject ? (
             <CardContent className="min-w-0 p-4 sm:p-6">
               {loading ? (
                 <div className="flex justify-center items-center py-16">
@@ -465,16 +566,13 @@ export default function GradeEntryForm({
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-muted border-b">
-                          <TableHead className="w-[60%] font-bold px-4 py-2 text-foreground">
+                          <TableHead className="font-bold px-4 py-2 text-foreground">
                             Estudiante
                           </TableHead>
-                          <TableHead className="w-[30%] font-bold px-4 py-2 text-foreground">
-                            Observación General
-                          </TableHead>
-                          <TableHead className="font-bold w-[5%] px-4 py-2 text-center text-foreground">
+                          <TableHead className="font-bold w-[5.5rem] px-4 py-2 text-center text-foreground">
                             Nota
                           </TableHead>
-                          <TableHead className="font-bold w-[5%] px-4 py-2 text-center text-foreground">
+                          <TableHead className="font-bold w-[4.5rem] px-4 py-2 text-center text-foreground">
                             DS
                           </TableHead>
                         </TableRow>
@@ -487,7 +585,7 @@ export default function GradeEntryForm({
                               key={student.id}
                               className="border-b hover:bg-azul-50 transition-colors"
                             >
-                              <TableCell className="w-[60%] p-4 align-bottom">
+                              <TableCell className="p-4 align-bottom">
                                 <div className="flex items-center gap-3 mb-3">
                                   <div className="font-bold text-foreground text-sm">
                                     {student.name}
@@ -510,25 +608,7 @@ export default function GradeEntryForm({
                                   />
                                 </div>
                               </TableCell>
-                              <TableCell className="w-[30%] p-4 align-bottom">
-                                <div className="relative">
-                                  <label className="absolute -top-2 left-3 bg-card px-1 text-xs font-medium text-muted-foreground">
-                                    Observación general
-                                  </label>
-                                  <Textarea
-                                    placeholder="Observaciones generales sobre el desempeño del estudiante..."
-                                    value={observations[student.id] || ""}
-                                    onChange={(e) =>
-                                      handleObservationChange(
-                                        student.id,
-                                        e.target.value
-                                      )
-                                    }
-                                    className="min-h-[120px] w-full whitespace-pre-wrap border-input rounded-md pt-3 focus:ring-2 focus:ring-coral-500 focus:border-coral-500"
-                                  />
-                                </div>
-                              </TableCell>
-                              <TableCell className="w-[5%] p-4 align-middle text-center">
+                              <TableCell className="p-4 align-middle text-center">
                                 <div className="relative mt-4">
                                   <Input
                                     type="number"
@@ -550,7 +630,7 @@ export default function GradeEntryForm({
                                   </span>
                                 </div>
                               </TableCell>
-                              <TableCell className="w-[5%] p-4 align-middle text-center">
+                              <TableCell className="p-4 align-middle text-center">
                                 <div className="flex justify-center">
                                   {(() => {
                                     const ds = calculateDS(
@@ -605,8 +685,8 @@ export default function GradeEntryForm({
                     Seleccione una asignatura
                   </h3>
                   <p className="text-muted-foreground">
-                    Elija una asignatura para comenzar a ingresar calificaciones
-                    y observaciones para los estudiantes.
+                    Elija una asignatura para ingresar calificaciones, u
+                    Observaciones generales para la observación del periodo.
                   </p>
                 </div>
               </div>
@@ -615,7 +695,7 @@ export default function GradeEntryForm({
         </div>
       </Card>
 
-      {selectedSubject ? (
+      {showGradeBar ? (
         <SaveGradesBar
           state={saveBarState}
           disabled={loading || saving}
