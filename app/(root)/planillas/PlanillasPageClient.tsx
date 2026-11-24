@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Degree, Period, Subject, Student } from "@prisma/client";
 import { getSubjectsByDegree } from "@/lib/actions/subject.actions";
 import { getStudentsByDegree } from "@/lib/actions/student.actions";
@@ -13,14 +13,18 @@ import UnsavedChangesDialog from "@/components/shared/planilla/UnsavedChangesDia
 interface PlanillasPageClientProps {
   initialDegrees: Degree[];
   initialPeriods: Period[];
+  initialDegreeId?: string;
+  initialPeriodId?: string;
 }
 
 export default function PlanillasPageClient({
   initialDegrees,
   initialPeriods,
+  initialDegreeId = "",
+  initialPeriodId = "",
 }: PlanillasPageClientProps) {
-  const [selectedDegree, setSelectedDegree] = useState("");
-  const [selectedPeriod, setSelectedPeriod] = useState("");
+  const [selectedDegree, setSelectedDegree] = useState(initialDegreeId);
+  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriodId);
   const [showGradeGrid, setShowGradeGrid] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -58,6 +62,11 @@ export default function PlanillasPageClient({
 
   const searchRef = useRef(performSearch);
   searchRef.current = performSearch;
+
+  useEffect(() => {
+    if (!initialDegreeId || !initialPeriodId) return;
+    void searchRef.current();
+  }, [initialDegreeId, initialPeriodId]);
 
   const runOrConfirm = (action: () => void) => {
     if (

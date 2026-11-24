@@ -4,7 +4,13 @@ import { requireUser } from "@/lib/auth/session";
 import { NoAssignedDegrees } from "@/components/shared/portal/NoAssignedDegrees";
 import PlanillasPageClient from "./PlanillasPageClient";
 
-export default async function PlanillasPageServer() {
+export default async function PlanillasPageServer({
+  initialDegreeId = "",
+  initialPeriodId = "",
+}: {
+  initialDegreeId?: string;
+  initialPeriodId?: string;
+}) {
   const user = await requireUser();
   const degrees = await getDegrees();
 
@@ -13,11 +19,20 @@ export default async function PlanillasPageServer() {
   }
 
   const periods = await getPeriods();
+  const degreeId = degrees.some((degree) => degree.id === initialDegreeId)
+    ? initialDegreeId
+    : "";
+  const periodId = periods.some((period) => period.id === initialPeriodId)
+    ? initialPeriodId
+    : "";
 
   return (
     <PlanillasPageClient
+      key={`${degreeId}:${periodId}`}
       initialDegrees={degrees}
       initialPeriods={periods}
+      initialDegreeId={degreeId}
+      initialPeriodId={periodId}
     />
   );
-} 
+}

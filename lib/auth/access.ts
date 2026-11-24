@@ -25,6 +25,16 @@ export async function requireAdminAction(): Promise<ActionUser> {
   return user;
 }
 
+export async function requireStudentAdmin(): Promise<ActionUser> {
+  const user = await requireActionUser();
+  if (user.role !== "ADMIN") {
+    throw new AuthError(
+      "Solo el administrador puede crear, editar o eliminar estudiantes."
+    );
+  }
+  return user;
+}
+
 export function assertDegreeAccess(user: ActionUser, degreeId: string) {
   if (user.role === "ADMIN") return;
   if (!user.degreeIds.includes(degreeId)) {
