@@ -1,9 +1,13 @@
 "use server";
 
 import prisma from "@/db/prisma";
+import { assertDegreeAccess, requireActionUser } from "@/lib/auth/access";
 
 export async function getSubjectsByDegree(degreeId: string) {
   try {
+    const user = await requireActionUser();
+    assertDegreeAccess(user, degreeId);
+
     const subjects = await prisma.subject.findMany({
       where: {
         degrees: {

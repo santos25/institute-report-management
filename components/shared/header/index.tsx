@@ -16,6 +16,8 @@ import { GraduationCap, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getWhatsAppUrl, SITE } from "@/lib/site";
 import { WhatsAppIcon } from "@/components/landing/whatsapp-icon";
+import { logout } from "@/lib/auth/actions";
+import { roleLabel, type HeaderUser } from "@/lib/auth/roles";
 
 const LANDING_NAV = [
   { label: "Nosotros", href: "#nosotros" },
@@ -26,7 +28,7 @@ const LANDING_NAV = [
   { label: "Contacto", href: "#contacto" },
 ];
 
-export const Header = () => {
+export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -131,11 +133,24 @@ export const Header = () => {
             >
               Avance
             </Link>
+            {user?.role === "ADMIN" && (
+              <Link
+                href="/usuarios"
+                className={cn(
+                  "rounded-full px-3 py-2 text-sm",
+                  pathname.startsWith("/usuarios")
+                    ? "bg-azul-50 font-medium text-azul-700"
+                    : "text-tinta-600 hover:text-azul-700"
+                )}
+              >
+                Usuarios
+              </Link>
+            )}
           </nav>
         )}
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          {isLanding && (
+          {isLanding ? (
             <>
               <Button
                 variant="outline"
@@ -163,7 +178,28 @@ export const Header = () => {
                 </a>
               </Button>
             </>
-          )}
+          ) : user ? (
+            <div className="hidden items-center gap-3 md:flex">
+              <div className="text-right leading-tight">
+                <p className="max-w-40 truncate text-sm font-semibold text-tinta">
+                  {user.name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {roleLabel(user.role)}
+                </p>
+              </div>
+              <form action={logout}>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                >
+                  Cerrar sesión
+                </Button>
+              </form>
+            </div>
+          ) : null}
 
           <div className={cn(isLanding ? "xl:hidden" : "md:hidden")}>
             <Sheet open={open} onOpenChange={setOpen}>
@@ -226,9 +262,37 @@ export const Header = () => {
                       >
                         Avance
                       </Link>
+                      {user?.role === "ADMIN" && (
+                        <Link
+                          href="/usuarios"
+                          onClick={() => setOpen(false)}
+                          className="rounded-xl px-3 py-3 text-base text-tinta hover:bg-azul-50"
+                        >
+                          Usuarios
+                        </Link>
+                      )}
                     </>
                   )}
                 </nav>
+                {!isLanding && user && (
+                  <div className="mt-8 space-y-3 border-t border-border pt-6">
+                    <p className="px-3 text-sm font-semibold text-tinta">
+                      {user.name}
+                    </p>
+                    <p className="px-3 text-sm text-muted-foreground">
+                      {roleLabel(user.role)}
+                    </p>
+                    <form action={logout}>
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        className="w-full rounded-full"
+                      >
+                        Cerrar sesión
+                      </Button>
+                    </form>
+                  </div>
+                )}
                 {isLanding && (
                   <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6">
                     <Button

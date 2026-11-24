@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PeriodProgressBoard from "@/components/shared/avance/PeriodProgressBoard";
+import { requireUser } from "@/lib/auth/session";
 import { getPeriodProgress } from "@/lib/progress";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,7 @@ function firstParam(value: string | string[] | undefined): string | undefined {
 }
 
 export default async function AvancePage({ searchParams }: AvancePageProps) {
+  await requireUser();
   const params = await searchParams;
   const progress = await getPeriodProgress(firstParam(params.periodo));
 

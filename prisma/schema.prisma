@@ -19,6 +19,7 @@ model Degree {
   name      String    @unique // "Párvulo", "Prejardín", etc.
   subjects  Subject[] // Subjects specific to this degree
   students  Student[]
+  users     User[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -61,9 +62,11 @@ model Period {
 model User {
   id        String   @id @default(cuid())
   name      String
-  email     String   @unique
-  password  String?
-  role      String // "ADMIN", "TEACHER"
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  role      String // "ADMIN" | "TEACHER"
+  degrees   Degree[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

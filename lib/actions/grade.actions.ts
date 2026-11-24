@@ -1,6 +1,12 @@
 "use server";
 
 import prisma from "@/db/prisma";
+import {
+  assertDegreeAccess,
+  assertStudentAccess,
+  assertStudentsAccess,
+  requireActionUser,
+} from "@/lib/auth/access";
 
 interface GradeData {
   studentId: string;
@@ -13,6 +19,12 @@ interface GradeData {
 
 export async function saveGrades(grades: GradeData[]) {
   try {
+    const user = await requireActionUser();
+    await assertStudentsAccess(
+      user,
+      grades.map((grade) => grade.studentId)
+    );
+
     // Start a transaction for all operations
     return await prisma.$transaction(async (tx) => {
       const savedGrades = [];
@@ -95,10 +107,14 @@ export async function getGradesBySubjectAndPeriod(
   periodId: string
 ) {
   try {
+    const user = await requireActionUser();
     const grades = await prisma.studentGrade.findMany({
       where: {
         subjectId,
         periodId,
+        ...(user.role === "ADMIN"
+          ? {}
+          : { student: { degreeId: { in: user.degreeIds } } }),
       },
       include: {
         student: true,
@@ -126,6 +142,9 @@ export async function getGradesByStudentAndPeriod(
   periodId: string
 ) {
   try {
+    const user = await requireActionUser();
+    await assertStudentAccess(user, studentId);
+
     const grades = await prisma.studentGrade.findMany({
       where: {
         studentId,
@@ -148,6 +167,9 @@ export async function getGradesByDegreeAndPeriod(
   periodId: string
 ) {
   try {
+    const user = await requireActionUser();
+    assertDegreeAccess(user, degreeId);
+
     const students = await prisma.student.findMany({
       where: {
         degreeId,
@@ -184,6 +206,9 @@ export async function getGradeCountsByDegreePeriod(
   | { success: false; error: string; counts: Record<string, number> }
 > {
   try {
+    const user = await requireActionUser();
+    assertDegreeAccess(user, degreeId);
+
     const grouped = await prisma.studentGrade.groupBy({
       by: ["subjectId"],
       where: {
@@ -216,6 +241,9 @@ export async function getGradesAndObservationsBySubjectPeriod(
   degreeId: string
 ) {
   try {
+    const user = await requireActionUser();
+    assertDegreeAccess(user, degreeId);
+
     // First get the period to determine the year
     const period = await prisma.period.findUnique({
       where: {
