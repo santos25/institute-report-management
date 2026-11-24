@@ -4,6 +4,11 @@ import {
   type ActionUser,
 } from "@/lib/auth/session";
 
+// La sesión de acudientes vive en la cookie `guardian_session` y su token
+// exige typ "guardian" (sin rol de personal). getActionUser solo lee la
+// cookie `session` y exige rol ADMIN o TEACHER, así que esa cookie no
+// autoriza estas acciones ni requireUser.
+
 export class AuthError extends Error {
   constructor(message = "No autorizado.") {
     super(message);
