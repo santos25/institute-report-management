@@ -1,12 +1,13 @@
 import prisma from "@/db/prisma";
 import {
   buildChildDetail,
+  childBoletinAction,
   childDetailAction,
   type ChildDetail,
 } from "@/lib/guardian/child-detail";
 
 /**
- * Detalle de un hijo del acudiente de la sesión, solo del año indicado.
+ * Detalle de un hijo del acudiente de la sesión: año indicado y periodos publicados.
  * El id de la URL no basta: la fila tiene que tener ese guardianId.
  * Si no hay coincidencia, no se lee ni se registra nada.
  */
@@ -14,6 +15,7 @@ export async function getGuardianChildDetail(input: {
   guardianId: string;
   studentId: string;
   year: number;
+  access?: "detail" | "boletin";
 }): Promise<ChildDetail | null> {
   if (!input.guardianId || !input.studentId) return null;
 
@@ -26,15 +28,15 @@ export async function getGuardianChildDetail(input: {
       id: true,
       name: true,
       guardianId: true,
-      degree: { select: { name: true } },
+      degree: { select: { id: true, name: true } },
     },
   });
 
   if (!student || student.guardianId !== input.guardianId) return null;
 
   const periods = await prisma.period.findMany({
-    where: { year: input.year },
-    select: { id: true, number: true, year: true },
+    where: { year: input.year, visibleToGuardians: true },
+    select: { id: true, number: true, year: true, visibleToGuardians: true },
     orderBy: { number: "asc" },
   });
   const periodIds = periods.map((period) => period.id);
@@ -72,9 +74,15 @@ export async function getGuardianChildDetail(input: {
       id: student.id,
       name: student.name,
       guardianId: student.guardianId,
+      degreeId: student.degree.id,
       degreeName: student.degree.name,
     },
-    periods,
+    periods: periods.map((period) => ({
+      id: period.id,
+      number: period.number,
+      year: period.year,
+      published: period.visibleToGuardians,
+    })),
     grades: grades.map((grade) => ({
       studentId: grade.studentId,
       periodId: grade.periodId,
@@ -91,7 +99,10 @@ export async function getGuardianChildDetail(input: {
   await prisma.guardianAccessLog.create({
     data: {
       guardianId: input.guardianId,
-      action: childDetailAction(student.id),
+      action:
+        input.access === "boletin"
+          ? childBoletinAction(student.id)
+          : childDetailAction(student.id),
     },
   });
 

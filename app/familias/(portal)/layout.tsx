@@ -14,7 +14,7 @@ export default async function FamiliasLayout({
 
   return (
     <div className="min-h-screen bg-crema">
-      <header className="border-b border-border/70 bg-crema/95">
+      <header className="border-b border-border/70 bg-crema/95 print:hidden">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between gap-3 px-4">
           <div className="flex min-w-0 items-center gap-3">
             <Image

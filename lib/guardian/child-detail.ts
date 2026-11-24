@@ -1,5 +1,6 @@
 import { SUBJECT_HOURS_BY_GRADE } from "@/lib/constant";
 import { GUARDIAN_ACCESS } from "@/lib/guardian/credentials";
+import type { StudentReport } from "@/lib/actions/report.actions";
 import { calculateDS } from "@/lib/utils";
 
 export type ChildPerformance = {
@@ -26,6 +27,7 @@ export type ChildDetail = {
   student: {
     id: string;
     name: string;
+    degreeId: string;
     degreeName: string;
   };
   year: number;
@@ -36,6 +38,7 @@ export type DetailStudent = {
   id: string;
   name: string;
   guardianId: string | null;
+  degreeId: string;
   degreeName: string;
 };
 
@@ -43,6 +46,7 @@ export type DetailPeriod = {
   id: string;
   number: number;
   year: number;
+  published: boolean;
 };
 
 export type DetailGrade = {
@@ -71,6 +75,10 @@ export function childDetailAction(studentId: string) {
   return `${GUARDIAN_ACCESS.VIEW_CHILD}:${studentId}`;
 }
 
+export function childBoletinAction(studentId: string) {
+  return `${GUARDIAN_ACCESS.VIEW_BOLETIN}:${studentId}`;
+}
+
 export function performanceForGrade(grade: number): ChildPerformance | null {
   const result = calculateDS(grade);
   const name = PERFORMANCE_NAMES[result.label];
@@ -88,7 +96,7 @@ function subjectRank(degreeName: string, subjectName: string) {
 
 /**
  * Arma el detalle de un solo hijo. Devuelve null si el estudiante no pertenece
- * al acudiente. Ignora otros años, otros estudiantes y notas en cero.
+ * al acudiente. Ignora otros años, periodos sin publicar, otros estudiantes y notas en cero.
  */
 export function buildChildDetail(input: {
   guardianId: string;
@@ -102,7 +110,7 @@ export function buildChildDetail(input: {
   if (!guardianId || !student || student.guardianId !== guardianId) return null;
 
   const periods = input.periods
-    .filter((period) => period.year === year)
+    .filter((period) => period.year === year && period.published)
     .sort((a, b) => a.number - b.number);
   const periodIds = new Set(periods.map((period) => period.id));
 
@@ -151,9 +159,32 @@ export function buildChildDetail(input: {
     student: {
       id: student.id,
       name: student.name,
+      degreeId: student.degreeId,
       degreeName: student.degreeName,
     },
     year,
     periods: periodDetails,
+  };
+}
+
+/** Misma forma que el boletín del personal, solo con los periodos ya filtrados. */
+export function childDetailToReport(detail: ChildDetail): StudentReport {
+  return {
+    student: {
+      id: detail.student.id,
+      name: detail.student.name,
+      degreeId: detail.student.degreeId,
+    },
+    periodGrades: detail.periods.map((period) => ({
+      periodId: period.id,
+      periodNumber: period.number,
+      grades: period.subjects.map((subject) => ({
+        subjectId: subject.id,
+        subjectName: subject.name,
+        grade: subject.grade,
+        achievements: subject.achievements,
+      })),
+      observation: period.observation,
+    })),
   };
 }

@@ -52,13 +52,14 @@ model Student {
 }
 
 model Period {
-  id           String               @id @default(cuid())
-  number       Int // 1, 2, 3, 4
-  year         Int
-  observations StudentObservation[]
-  grades       StudentGrade[]
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
+  id                  String               @id @default(cuid())
+  number              Int // 1, 2, 3, 4
+  year                Int
+  visibleToGuardians  Boolean              @default(false)
+  observations        StudentObservation[]
+  grades              StudentGrade[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
   @@unique([number, year])
 }

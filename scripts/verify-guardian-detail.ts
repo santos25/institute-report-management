@@ -47,7 +47,7 @@ async function main() {
   const { default: prisma } = await import("../db/prisma");
   const { getActiveSchoolYear } = await import("../lib/school-year");
   const { getGuardianChildDetail } = await import("../lib/guardian/load-child-detail");
-  const { childDetailAction } = await import("../lib/guardian/child-detail");
+  const { childBoletinAction, childDetailAction } = await import("../lib/guardian/child-detail");
 
   const branchRows = await prisma.$queryRawUnsafe<Array<{ branch: string | null }>>(
     "SELECT current_setting('neon.branch_id', true) AS branch"
@@ -68,19 +68,11 @@ async function main() {
     throw new Error("Faltan grados o materias para la prueba.");
   }
 
-  const currentPeriod = await prisma.period.findFirst({
-    where: { year },
-    orderBy: { number: "asc" },
-  });
-  if (!currentPeriod) {
-    throw new Error(`No hay periodos del año ${year} en la copia de desarrollo.`);
-  }
-
   const otherYear = year === 2099 ? 2098 : 2099;
   const guardianIds: string[] = [];
   const studentIds: string[] = [];
-  let otherPeriodId: string | null = null;
-  let createdOtherPeriod = false;
+  const createdPeriodIds: string[] = [];
+  const restoredFlags: Array<{ id: string; visibleToGuardians: boolean }> = [];
 
   async function cleanup() {
     if (studentIds.length > 0) {
@@ -96,25 +88,58 @@ async function main() {
       });
       await prisma.guardian.deleteMany({ where: { id: { in: guardianIds } } });
     }
-    if (createdOtherPeriod && otherPeriodId) {
-      const remaining = await prisma.studentGrade.count({
-        where: { periodId: otherPeriodId },
+    for (const flag of restoredFlags) {
+      if (createdPeriodIds.includes(flag.id)) continue;
+      await prisma.period.update({
+        where: { id: flag.id },
+        data: { visibleToGuardians: flag.visibleToGuardians },
       });
-      if (remaining === 0) {
-        await prisma.period.deleteMany({ where: { id: otherPeriodId } });
+    }
+    for (const periodId of createdPeriodIds) {
+      const remaining = await prisma.studentGrade.count({ where: { periodId } });
+      const observations = await prisma.studentObservation.count({ where: { periodId } });
+      if (remaining === 0 && observations === 0) {
+        await prisma.period.deleteMany({ where: { id: periodId } });
       }
     }
   }
 
-  try {
-    const existingOther = await prisma.period.findFirst({
-      where: { number: 1, year: otherYear },
+  async function periodFor(number: number, periodYear: number, published: boolean) {
+    const existing = await prisma.period.findFirst({
+      where: { number, year: periodYear },
     });
-    const otherPeriod =
-      existingOther ??
-      (await prisma.period.create({ data: { number: 1, year: otherYear } }));
-    otherPeriodId = otherPeriod.id;
-    createdOtherPeriod = !existingOther;
+    if (existing) {
+      const grades = await prisma.studentGrade.count({ where: { periodId: existing.id } });
+      const observations = await prisma.studentObservation.count({
+        where: { periodId: existing.id },
+      });
+      if (grades === 0 && observations === 0) {
+        await prisma.period.delete({ where: { id: existing.id } });
+      } else {
+        restoredFlags.push({
+          id: existing.id,
+          visibleToGuardians: existing.visibleToGuardians,
+        });
+        if (existing.visibleToGuardians !== published) {
+          await prisma.period.update({
+            where: { id: existing.id },
+            data: { visibleToGuardians: published },
+          });
+        }
+        return existing;
+      }
+    }
+    const created = await prisma.period.create({
+      data: { number, year: periodYear, visibleToGuardians: published },
+    });
+    createdPeriodIds.push(created.id);
+    return created;
+  }
+
+  try {
+    const publishedPeriod = await periodFor(7, year, true);
+    const hiddenPeriod = await periodFor(8, year, false);
+    const otherPeriod = await periodFor(1, otherYear, true);
 
     const leftovers = await prisma.guardian.findMany({
       where: { identification: { in: [CEDULA_A, CEDULA_B] } },
@@ -179,9 +204,16 @@ async function main() {
         {
           studentId: childA.id,
           subjectId: subject.id,
-          periodId: currentPeriod.id,
+          periodId: publishedPeriod.id,
           grade: 4.2,
           achievements: "Logro solo de A",
+        },
+        {
+          studentId: childA.id,
+          subjectId: subject.id,
+          periodId: hiddenPeriod.id,
+          grade: 5,
+          achievements: "Logro sin publicar",
         },
         {
           studentId: childA.id,
@@ -193,7 +225,7 @@ async function main() {
         {
           studentId: childB.id,
           subjectId: subject.id,
-          periodId: currentPeriod.id,
+          periodId: publishedPeriod.id,
           grade: 1.5,
           achievements: "Logro solo de B",
         },
@@ -203,12 +235,17 @@ async function main() {
       data: [
         {
           studentId: childA.id,
-          periodId: currentPeriod.id,
+          periodId: publishedPeriod.id,
           content: "Observación solo de A",
         },
         {
+          studentId: childA.id,
+          periodId: hiddenPeriod.id,
+          content: "Observación sin publicar",
+        },
+        {
           studentId: childB.id,
-          periodId: currentPeriod.id,
+          periodId: publishedPeriod.id,
           content: "Observación solo de B",
         },
       ],
@@ -228,11 +265,12 @@ async function main() {
       serialized.includes("Logro solo de B") ||
       serialized.includes("Observación solo de B") ||
       serialized.includes("Logro de otro año") ||
+      serialized.includes("sin publicar") ||
       own.year !== year
     ) {
-      throw new Error("El detalle de A filtró otro niño u otro año.");
+      throw new Error("El detalle de A filtró otro niño, otro año o un periodo sin publicar.");
     }
-    const period = own.periods.find((item) => item.number === currentPeriod.number);
+    const period = own.periods.find((item) => item.number === publishedPeriod.number);
     if (!period || period.subjects[0]?.grade !== 4.2 || period.observation !== "Observación solo de A") {
       throw new Error("El detalle de A no trajo su nota o su observación.");
     }
@@ -256,18 +294,41 @@ async function main() {
     }
     console.log("Aislamiento: el id del hijo de B y un id inexistente no devuelven datos.");
 
+    const boletin = await getGuardianChildDetail({
+      guardianId: guardianA.id,
+      studentId: childA.id,
+      year,
+      access: "boletin",
+    });
+    if (!boletin || JSON.stringify(boletin).includes("sin publicar") || JSON.stringify(boletin).includes(CHILD_B)) {
+      throw new Error("El boletín de A incluyó un periodo sin publicar o al hijo de B.");
+    }
+    const foreignBoletin = await getGuardianChildDetail({
+      guardianId: guardianA.id,
+      studentId: childB.id,
+      year,
+      access: "boletin",
+    });
+    if (foreignBoletin !== null) throw new Error("A obtuvo el boletín del hijo de B.");
+    console.log("Boletín: A solo ve periodos publicados de su hijo.");
+
     const logs = await prisma.guardianAccessLog.findMany({
       where: { guardianId: guardianA.id },
+      orderBy: { createdAt: "asc" },
     });
-    const expected = childDetailAction(childA.id);
-    if (logs.length !== 1 || logs[0]?.action !== expected) {
-      throw new Error(`El registro de la vista no coincide: ${logs.map((log) => log.action).join(", ")}`);
+    const actions = logs.map((log) => log.action);
+    if (
+      actions.length !== 2 ||
+      actions[0] !== childDetailAction(childA.id) ||
+      actions[1] !== childBoletinAction(childA.id)
+    ) {
+      throw new Error(`El registro de la vista no coincide: ${actions.join(", ")}`);
     }
     const leaked = await prisma.guardianAccessLog.findFirst({
       where: { action: { contains: childB.id } },
     });
     if (leaked) throw new Error("Se registró la vista de un hijo ajeno.");
-    console.log("Bitácora: solo quedó la vista del propio hijo.");
+    console.log("Bitácora: quedaron la vista del detalle y la del boletín del propio hijo.");
     console.log("Verificación del detalle en base de datos: correcta.");
   } finally {
     await cleanup();

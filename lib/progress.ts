@@ -7,6 +7,7 @@ export type PeriodOption = {
   id: string;
   number: number;
   year: number;
+  visibleToGuardians: boolean;
 };
 
 export type SubjectProgress = {
@@ -99,7 +100,7 @@ export async function getPeriodProgress(
   const periods = await prisma.period.findMany({
     where: { year },
     orderBy: { number: "asc" },
-    select: { id: true, number: true, year: true },
+    select: { id: true, number: true, year: true, visibleToGuardians: true },
   });
 
   const period =

@@ -124,6 +124,7 @@ describe("rutas", () => {
       "/familias",
       "/familias/cambiar-clave",
       "/familias/hijos/estudiante-ajeno",
+      "/familias/hijos/estudiante-ajeno/boletin",
     ]) {
       assert.deepEqual(
         decideRequestAccess({
