@@ -16,6 +16,7 @@ export const GUARDIAN_ACCESS = {
   LOGOUT: "LOGOUT",
   PASSWORD_CHANGED: "PASSWORD_CHANGED",
   PASSWORD_RESET: "PASSWORD_RESET",
+  VIEW_CHILD: "VIEW_CHILD",
 } as const;
 
 export function generateInitialPassword(length = 10) {
