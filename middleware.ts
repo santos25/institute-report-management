@@ -8,10 +8,12 @@ function isPortalPath(pathname: string) {
     pathname.startsWith("/planillas/") ||
     pathname === "/boletines" ||
     pathname.startsWith("/boletines/") ||
-    pathname === "/usuarios" ||
-    pathname.startsWith("/usuarios/") ||
+    pathname === "/avance" ||
+    pathname.startsWith("/avance/") ||
     pathname === "/estudiantes" ||
-    pathname.startsWith("/estudiantes/")
+    pathname.startsWith("/estudiantes/") ||
+    pathname === "/usuarios" ||
+    pathname.startsWith("/usuarios/")
   );
 }
 
@@ -47,9 +49,11 @@ export const config = {
     "/planillas/:path*",
     "/boletines",
     "/boletines/:path*",
-    "/usuarios",
-    "/usuarios/:path*",
+    "/avance",
+    "/avance/:path*",
     "/estudiantes",
     "/estudiantes/:path*",
+    "/usuarios",
+    "/usuarios/:path*",
   ],
 };

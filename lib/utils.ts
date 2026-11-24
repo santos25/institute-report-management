@@ -140,8 +140,8 @@ export const calculateDS = (grade: string | number) => {
   return { label: "", variant: "secondary" as const, color: "" };
 };
 
-// Function to sort subjects in the specified order
-export const sortDegrees = (degrees: Degree[]) => {
+// Pedagogical order used by planillas, boletines and the progress board.
+export const sortDegrees = <T extends { name: string }>(degrees: T[]): T[] => {
   const order = [
     "Párvulo",
     "Pre Jardín",
@@ -154,20 +154,17 @@ export const sortDegrees = (degrees: Degree[]) => {
     "Quinto",
   ];
 
-  return degrees.sort((a, b) => {
+  return [...degrees].sort((a, b) => {
     const indexA = order.indexOf(a.name);
     const indexB = order.indexOf(b.name);
 
-    // If both subjects are in the order array, sort by their position
     if (indexA !== -1 && indexB !== -1) {
       return indexA - indexB;
     }
 
-    // If only one is in the order array, prioritize it
     if (indexA !== -1) return -1;
     if (indexB !== -1) return 1;
 
-    // If neither is in the order array, sort alphabetically
-    return a.name.localeCompare(b.name);
+    return a.name.localeCompare(b.name, "es");
   });
 };
