@@ -171,6 +171,45 @@ export async function getGradesByDegreeAndPeriod(
   }
 }
 
+/**
+ * Cuenta, por materia, cuántos estudiantes del grado ya tienen nota (1.0–5.0)
+ * en el periodo. Sirve solo para el avance de los chips de planillas.
+ * Una nota 0 es el valor que se escribe cuando la fila se guarda sin calificación.
+ */
+export async function getGradeCountsByDegreePeriod(
+  degreeId: string,
+  periodId: string
+): Promise<
+  | { success: true; counts: Record<string, number> }
+  | { success: false; error: string; counts: Record<string, number> }
+> {
+  try {
+    const grouped = await prisma.studentGrade.groupBy({
+      by: ["subjectId"],
+      where: {
+        periodId,
+        grade: { gte: 1, lte: 5 },
+        student: { degreeId },
+      },
+      _count: { _all: true },
+    });
+
+    const counts: Record<string, number> = {};
+    for (const row of grouped) {
+      counts[row.subjectId] = row._count._all;
+    }
+
+    return { success: true, counts };
+  } catch (error) {
+    console.error("Error counting grades by degree and period:", error);
+    return {
+      success: false,
+      error: (error as Error).message,
+      counts: {},
+    };
+  }
+}
+
 export async function getGradesAndObservationsBySubjectPeriod(
   subjectId: string,
   periodId: string,
