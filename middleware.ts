@@ -10,6 +10,8 @@ function isPortalPath(pathname: string) {
     pathname.startsWith("/boletines/") ||
     pathname === "/avance" ||
     pathname.startsWith("/avance/") ||
+    pathname === "/estudiantes" ||
+    pathname.startsWith("/estudiantes/") ||
     pathname === "/usuarios" ||
     pathname.startsWith("/usuarios/")
   );
@@ -49,6 +51,8 @@ export const config = {
     "/boletines/:path*",
     "/avance",
     "/avance/:path*",
+    "/estudiantes",
+    "/estudiantes/:path*",
     "/usuarios",
     "/usuarios/:path*",
   ],
