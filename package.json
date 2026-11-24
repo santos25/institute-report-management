@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test lib/auth/guardian-isolation.test.ts",
+    "test": "node --import tsx --test lib/auth/guardian-isolation.test.ts lib/guardian/child-detail.test.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

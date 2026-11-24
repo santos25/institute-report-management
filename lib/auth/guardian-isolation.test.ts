@@ -120,7 +120,11 @@ describe("rutas", () => {
   });
 
   it("el personal no entra al portal de familias con su sesión", () => {
-    for (const pathname of ["/familias", "/familias/cambiar-clave"]) {
+    for (const pathname of [
+      "/familias",
+      "/familias/cambiar-clave",
+      "/familias/hijos/estudiante-ajeno",
+    ]) {
       assert.deepEqual(
         decideRequestAccess({
           pathname,
