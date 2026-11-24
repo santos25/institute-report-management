@@ -67,7 +67,7 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
       `}</style>
       <Table className="border grades-table">
         <TableHeader>
-          <TableRow className="bg-gray-100">
+          <TableRow className="bg-muted">
             <TableHead className="border text-center w-full font-bold text-sm py-1">
               {PREESCOLAR_LEVEL.includes(report?.degree?.name || "")
                 ? "DIMENSIONES"
@@ -122,7 +122,7 @@ const ReportGradesTable: React.FC<ReportGradesTableProps> = ({ report }) => {
             );
           })}
           {/* Average row */}
-          <TableRow className="border-b bg-gray-50 average-row">
+          <TableRow className="border-b bg-crema-100 average-row">
             <TableCell
               className="border p-1 w-full font-bold text-right text-sm"
               colSpan={2}

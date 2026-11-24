@@ -143,7 +143,9 @@ export default function PlanillasPageClient({
 
   return (
     <div className="max-w-6xl container mx-auto py-8 px-2">
-      <h1 className="text-2xl font-bold mb-6">Registro de Calificaciones</h1>
+      <h1 className="font-display text-2xl font-bold mb-6">
+        Registro de Calificaciones
+      </h1>
 
       <GradeEntrySelection
         degrees={initialDegrees}

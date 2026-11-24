@@ -67,7 +67,9 @@ export default function BoletinesPageClient({
 
   return (
     <div className="max-w-5xl container mx-auto py-8 px-2">
-      <h1 className="text-2xl font-bold mb-6">Reporte de Boletines</h1>
+      <h1 className="font-display text-2xl font-bold mb-6">
+        Reporte de Boletines
+      </h1>
 
       <ReportSelection
         degrees={initialDegrees}

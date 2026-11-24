@@ -117,11 +117,11 @@ export default function ReportsTable({
         <CardHeader className="">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="w-10 h-10 bg-azul-100 rounded-full flex items-center justify-center">
+                <FileText className="w-5 h-5 text-azul-600" />
               </div>
               <div>
-                <CardTitle className="text-xl text-gray-800 dark:text-gray-200">
+                <CardTitle className="text-xl text-foreground">
                   Boletines de Calificaciones
                 </CardTitle>
                 <p className="text-sm  mt-1">
@@ -134,7 +134,7 @@ export default function ReportsTable({
                 onClick={handlePrintAllReports}
                 disabled={isBulkPrinting}
                 aria-busy={isBulkPrinting}
-                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
+                className="w-full sm:w-auto bg-success text-success-foreground hover:bg-success/90"
                 size="default"
               >
                 {isBulkPrinting ? (
@@ -153,14 +153,14 @@ export default function ReportsTable({
               <div className="overflow-x-auto border rounded-lg">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gray-50 dark:bg-gray-900">
-                      <TableHead className="font-bold text-gray-700 dark:text-gray-300 p-4">
+                    <TableRow className="bg-muted">
+                      <TableHead className="font-bold text-foreground p-4">
                         Estudiante
                       </TableHead>
-                      <TableHead className="font-bold text-gray-700 dark:text-gray-300 p-4">
+                      <TableHead className="font-bold text-foreground p-4">
                         Periodos Registrados
                       </TableHead>
-                      <TableHead className="font-bold text-gray-700 dark:text-gray-300 p-4 text-center">
+                      <TableHead className="font-bold text-foreground p-4 text-center">
                         Acciones
                       </TableHead>
                     </TableRow>
@@ -171,7 +171,7 @@ export default function ReportsTable({
                         <Badge
                           key={p.periodNumber}
                           variant="outline"
-                          className="mr-1 mb-1 bg-green-50 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
+                          className="mr-1 mb-1 bg-hoja-50 text-hoja-800 border-hoja-200"
                         >
                           P{p.periodNumber}
                         </Badge>
@@ -180,17 +180,17 @@ export default function ReportsTable({
                       return (
                         <TableRow
                           key={report.student.id}
-                          className="hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors border-b"
+                          className="hover:bg-azul-50 transition-colors border-b"
                         >
                           <TableCell className="p-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="font-bold text-blue-700 dark:text-blue-300 text-sm">
+                              <div className="w-8 h-8 bg-azul-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span className="font-bold text-azul-700 text-sm">
                                   {index + 1}
                                 </span>
                               </div>
                               <div>
-                                <div className="font-medium text-gray-900 dark:text-gray-100">
+                                <div className="font-medium text-foreground">
                                   {report.student.name}
                                 </div>
                               </div>
@@ -224,13 +224,13 @@ export default function ReportsTable({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                <FileText className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                <FileText className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 No hay boletines disponibles
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 max-w-md">
+              <p className="text-muted-foreground max-w-md">
                 No hay información de calificaciones para los estudiantes en
                 este grado y año académico.
               </p>
