@@ -6,6 +6,7 @@ import {
   getStudentReportsByDegreeAndYear,
   StudentReport,
 } from "@/lib/actions/report.actions";
+import BoletinesModeNav from "@/components/shared/boletines/BoletinesModeNav";
 import ReportSelection from "@/components/shared/boletines/ReportSelection";
 import ReportsTable from "@/components/shared/boletines/ReportsTable";
 
@@ -67,6 +68,7 @@ export default function BoletinesPageClient({
 
   return (
     <div className="max-w-5xl container mx-auto py-8 px-2">
+      <BoletinesModeNav current="periodo" />
       <h1 className="font-display text-2xl font-bold mb-6">
         Reporte de Boletines
       </h1>

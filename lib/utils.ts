@@ -1,8 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { StudentReport } from "./actions/report.actions";
-import { Degree } from "@prisma/client";
-import {
+import type { StudentReport } from "./actions/report.actions";
+import type { Degree } from "@prisma/client";
+import type {
   FormattedStudentReport,
   SubjectData,
 } from "@/components/shared/boletines/ReportsTable";
@@ -24,6 +24,17 @@ export function boletinDownloadTitle(
     .replace(/^-+|-+$/g, "");
 
   return `Boletines-${grado || "Grado"}-${year}`;
+}
+
+/** Nombre de archivo: Boletines-Final-<Grado>-<Año> */
+export function boletinFinalDownloadTitle(
+  degreeName: string | undefined,
+  year: string
+) {
+  return boletinDownloadTitle(degreeName, year).replace(
+    /^Boletines-/,
+    "Boletines-Final-"
+  );
 }
 
 export const calculateFinalGrade = (

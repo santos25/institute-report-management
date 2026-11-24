@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { sortDegrees } from "@/lib/utils";
+import { cn, sortDegrees } from "@/lib/utils";
 import { Degree } from "@prisma/client";
 
 // Selection form component for reports
@@ -21,6 +21,8 @@ export default function ReportSelection({
   onYearChange,
   onSearch,
   loading = false,
+  actionLabel = "Generar Boletines",
+  className,
 }: {
   degrees: Degree[];
   years: { id: string; year: number }[];
@@ -30,9 +32,11 @@ export default function ReportSelection({
   onYearChange: (value: string) => void;
   onSearch: () => void;
   loading?: boolean;
+  actionLabel?: string;
+  className?: string;
 }) {
   return (
-    <Card className="mb-6 border rounded-lg shadow-sm">
+    <Card className={cn("mb-6 border rounded-lg shadow-sm", className)}>
       <CardContent className="">
         <div className="flex flex-col md:flex-row items-end gap-4">
           <div className="w-full md:w-1/3 space-y-2">
@@ -129,7 +133,7 @@ export default function ReportSelection({
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  Generar Boletines
+                  {actionLabel}
                 </div>
               )}
             </Button>
