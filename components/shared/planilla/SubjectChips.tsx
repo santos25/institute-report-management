@@ -45,13 +45,17 @@ export default function SubjectChips({
 
     const delta =
       activeRect.left - rowRect.left - (rowRect.width - activeRect.width) / 2;
-    row.scrollBy({ left: delta });
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    row.scrollBy({ left: delta, behavior: reduceMotion ? "auto" : "smooth" });
   }, [activeId]);
 
   return (
-    <div className="sticky top-16 z-30 border-y border-border bg-card/95 backdrop-blur-md sm:top-[4.25rem]">
-      <div className="px-6 pt-3">
-        <Label id="subject-chips-label" className="whitespace-nowrap text-sm font-bold">
+    <div className="sticky top-16 z-30 bg-card/95 backdrop-blur-md sm:top-[4.25rem]">
+      <div className="px-4 pt-1 sm:px-6">
+        <Label
+          id="subject-chips-label"
+          className="text-xs font-semibold tracking-wide text-tinta-500"
+        >
           {label}
         </Label>
       </div>
@@ -59,7 +63,7 @@ export default function SubjectChips({
         role="group"
         aria-labelledby="subject-chips-label"
         ref={rowRef}
-        className="flex gap-2 overflow-x-auto overscroll-x-contain px-6 py-3"
+        className="flex overflow-x-auto overscroll-x-contain scroll-smooth border-b border-border [scrollbar-width:thin]"
       >
         {items.map((item) => {
           const progressDescription =
@@ -76,33 +80,21 @@ export default function SubjectChips({
               disabled={disabled}
               onClick={() => onSelect(item.id)}
               className={cn(
-                "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "inline-flex min-h-11 shrink-0 items-center gap-2 -mb-px border-b-2 px-4 py-2.5 text-sm transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 "disabled:cursor-not-allowed disabled:opacity-60",
                 item.active
-                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : "border-border bg-card text-foreground hover:bg-accent"
+                  ? "border-azul-500 font-bold text-tinta dark:text-crema"
+                  : "border-transparent font-medium text-tinta-600 hover:bg-azul-50 hover:text-tinta dark:text-crema-200 dark:hover:bg-azul-900/40 dark:hover:text-crema"
               )}
             >
               <span className="whitespace-nowrap">{item.name}</span>
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold tabular-nums",
-                  item.active
-                    ? "bg-primary-foreground/20 text-primary-foreground"
-                    : "bg-muted text-muted-foreground dark:bg-tinta-700 dark:text-crema-100"
-                )}
-              >
+              <span className="inline-flex items-center gap-1 text-xs font-medium tabular-nums text-tinta-500 dark:text-tinta-300">
                 {item.progressText}
                 {item.complete ? (
                   <Check
-                    className={cn(
-                      "size-3.5",
-                      item.active
-                        ? "text-primary-foreground"
-                        : "text-hoja-700 dark:text-hoja-300"
-                    )}
-                    strokeWidth={3}
+                    className="size-3.5 text-hoja-600 dark:text-hoja-300"
+                    strokeWidth={2.5}
                     aria-hidden
                   />
                 ) : null}
