@@ -122,6 +122,17 @@ export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
             >
               Boletines
             </Link>
+            <Link
+              href="/banco"
+              className={cn(
+                "rounded-full px-3 py-2 text-sm",
+                pathname.startsWith("/banco")
+                  ? "bg-azul-50 font-medium text-azul-700"
+                  : "text-tinta-600 hover:text-azul-700"
+              )}
+            >
+              Banco
+            </Link>
             {user?.role === "ADMIN" && (
               <Link
                 href="/usuarios"
@@ -238,6 +249,13 @@ export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
                         className="rounded-xl px-3 py-3 text-base text-tinta hover:bg-azul-50"
                       >
                         Boletines
+                      </Link>
+                      <Link
+                        href="/banco"
+                        onClick={() => setOpen(false)}
+                        className="rounded-xl px-3 py-3 text-base text-tinta hover:bg-azul-50"
+                      >
+                        Banco
                       </Link>
                       {user?.role === "ADMIN" && (
                         <Link

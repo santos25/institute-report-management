@@ -9,6 +9,7 @@ import {
   useState,
   type Ref,
 } from "react";
+import { Library, MessageSquareText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,17 @@ import { Subject } from "@prisma/client";
 import { getGradesAndObservationsBySubjectPeriod } from "@/lib/actions/grade.actions";
 import { getGradeCountsByDegreePeriod } from "@/lib/actions/grade.actions";
 import { saveGrades } from "@/lib/actions/grade.actions";
+import { getPlanillaBank } from "@/lib/actions/bank.actions";
+import {
+  appendBankPhrase,
+  type PlanillaAchievement,
+  type PlanillaObservation,
+} from "@/lib/bank";
+import {
+  AchievementPhraseList,
+  BankPhraseMenu,
+  ObservationPhraseList,
+} from "@/components/shared/planilla/BankPhraseMenu";
 import { PREESCOLAR_LEVEL } from "@/lib/constant";
 import { calculateDS } from "@/lib/utils";
 import SaveGradesBar from "@/components/shared/planilla/SaveGradesBar";
@@ -84,6 +96,17 @@ export default function GradeEntryForm({
     status: "loading" | "ready" | "error";
     counts: Record<string, number>;
   }>({ status: "loading", counts: {} });
+  const [bank, setBank] = useState<{
+    status: "loading" | "ready" | "error";
+    subjectId: string;
+    achievements: PlanillaAchievement[];
+    observations: PlanillaObservation[];
+  }>({
+    status: "loading",
+    subjectId: "",
+    achievements: [],
+    observations: [],
+  });
 
   const requestSeq = useRef(0);
   const saveInFlight = useRef<Promise<boolean> | null>(null);
@@ -160,6 +183,50 @@ export default function GradeEntryForm({
       cancelled = true;
     };
   }, [degree.id, period.id]);
+
+  useEffect(() => {
+    if (!selectedSubject) return;
+    let cancelled = false;
+    setBank((current) => ({
+      status: "loading",
+      subjectId: selectedSubject,
+      achievements: current.subjectId === selectedSubject ? current.achievements : [],
+      observations: current.subjectId === selectedSubject ? current.observations : [],
+    }));
+
+    getPlanillaBank(selectedSubject)
+      .then((result) => {
+        if (cancelled) return;
+        if (!result.ok) {
+          setBank({
+            status: "error",
+            subjectId: selectedSubject,
+            achievements: [],
+            observations: [],
+          });
+          return;
+        }
+        setBank({
+          status: "ready",
+          subjectId: selectedSubject,
+          achievements: result.achievements,
+          observations: result.observations,
+        });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setBank({
+          status: "error",
+          subjectId: selectedSubject,
+          achievements: [],
+          observations: [],
+        });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSubject]);
 
   useEffect(() => {
     if (changeCount === 0) return;
@@ -377,7 +444,6 @@ export default function GradeEntryForm({
   };
 
   const handleAchievementsChange = (studentId: string, value: string) => {
-    console.log(value);
     setSaveError(false);
     setAchievements((prev) => ({ ...prev, [studentId]: value }));
   };
@@ -493,10 +559,45 @@ export default function GradeEntryForm({
                                     {student.name}
                                   </div>
                                 </div>
-                                <div className="relative">
-                                  <label className="absolute -top-2 left-3 bg-card px-1 text-xs font-medium text-muted-foreground">
-                                    Logros del estudiante
-                                  </label>
+                                <div>
+                                  <div className="mb-2 flex items-center justify-between gap-2">
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                      Logros del estudiante
+                                    </span>
+                                    <BankPhraseMenu
+                                      label="Banco"
+                                      ariaLabel={`Abrir banco de logros de ${student.name}`}
+                                      icon={<Library className="size-3.5" aria-hidden />}
+                                    >
+                                      {(close) => (
+                                        <AchievementPhraseList
+                                          phrases={
+                                            bank.subjectId === selectedSubject
+                                              ? bank.achievements
+                                              : []
+                                          }
+                                          performance={
+                                            calculateDS(grades[student.id] || "").label
+                                          }
+                                          status={
+                                            bank.subjectId === selectedSubject
+                                              ? bank.status
+                                              : "loading"
+                                          }
+                                          onSelect={(content) => {
+                                            handleAchievementsChange(
+                                              student.id,
+                                              appendBankPhrase(
+                                                achievements[student.id] || "",
+                                                content
+                                              )
+                                            );
+                                            close();
+                                          }}
+                                        />
+                                      )}
+                                    </BankPhraseMenu>
+                                  </div>
                                   <Textarea
                                     placeholder="Describa los logros del estudiante para esta asignatura..."
                                     value={achievements[student.id] || ""}
@@ -506,15 +607,52 @@ export default function GradeEntryForm({
                                         e.target.value
                                       )
                                     }
-                                    className="min-h-[120px] w-full whitespace-pre-wrap border-input rounded-md pt-3 focus:ring-2 focus:ring-ring focus:border-ring"
+                                    className="min-h-[120px] w-full whitespace-pre-wrap"
                                   />
                                 </div>
                               </TableCell>
                               <TableCell className="w-[30%] p-4 align-bottom">
-                                <div className="relative">
-                                  <label className="absolute -top-2 left-3 bg-card px-1 text-xs font-medium text-muted-foreground">
-                                    Observación general
-                                  </label>
+                                <div>
+                                  <div className="mb-2 flex items-center justify-between gap-2">
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                      Observación general
+                                    </span>
+                                    <BankPhraseMenu
+                                      label="Banco"
+                                      ariaLabel={`Abrir banco de observaciones de ${student.name}`}
+                                      icon={
+                                        <MessageSquareText
+                                          className="size-3.5"
+                                          aria-hidden
+                                        />
+                                      }
+                                    >
+                                      {(close) => (
+                                        <ObservationPhraseList
+                                          phrases={
+                                            bank.subjectId === selectedSubject
+                                              ? bank.observations
+                                              : []
+                                          }
+                                          status={
+                                            bank.subjectId === selectedSubject
+                                              ? bank.status
+                                              : "loading"
+                                          }
+                                          onSelect={(content) => {
+                                            handleObservationChange(
+                                              student.id,
+                                              appendBankPhrase(
+                                                observations[student.id] || "",
+                                                content
+                                              )
+                                            );
+                                            close();
+                                          }}
+                                        />
+                                      )}
+                                    </BankPhraseMenu>
+                                  </div>
                                   <Textarea
                                     placeholder="Observaciones generales sobre el desempeño del estudiante..."
                                     value={observations[student.id] || ""}
@@ -524,7 +662,7 @@ export default function GradeEntryForm({
                                         e.target.value
                                       )
                                     }
-                                    className="min-h-[120px] w-full whitespace-pre-wrap border-input rounded-md pt-3 focus:ring-2 focus:ring-coral-500 focus:border-coral-500"
+                                    className="min-h-[120px] w-full whitespace-pre-wrap focus-visible:border-coral-500 focus-visible:ring-coral-500"
                                   />
                                 </div>
                               </TableCell>

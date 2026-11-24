@@ -25,12 +25,13 @@ model Degree {
 }
 
 model Subject {
-  id            String         @id @default(cuid())
-  name          String // "Comunicativa", "Cognitiva", etc.
-  degrees       Degree[] // Many-to-many with degrees
-  studentGrades StudentGrade[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id                   String                @id @default(cuid())
+  name                 String // "Comunicativa", "Cognitiva", etc.
+  degrees              Degree[] // Many-to-many with degrees
+  studentGrades        StudentGrade[]
+  achievementTemplates AchievementTemplate[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 
   @@unique([name])
 }
@@ -100,4 +101,26 @@ model StudentObservation {
   updatedAt DateTime @updatedAt
 
   @@unique([studentId, periodId])
+}
+
+// Frases reutilizables de logros, por materia y desempeño (S, A, B, BJ).
+model AchievementTemplate {
+  id          String   @id @default(cuid())
+  content     String
+  subjectId   String
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  performance String // "S" | "A" | "B" | "BJ"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([subjectId, performance])
+}
+
+// Frases reutilizables de observación general.
+model ObservationTemplate {
+  id        String   @id @default(cuid())
+  content   String
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
