@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { GraduationCap, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getWhatsAppUrl, SITE } from "@/lib/site";
 import { WhatsAppIcon } from "@/components/landing/whatsapp-icon";
@@ -122,6 +122,17 @@ export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
             >
               Boletines
             </Link>
+            <Link
+              href="/avance"
+              className={cn(
+                "rounded-full px-3 py-2 text-sm",
+                pathname.startsWith("/avance")
+                  ? "bg-azul-50 font-medium text-azul-700"
+                  : "text-tinta-600 hover:text-azul-700"
+              )}
+            >
+              Avance
+            </Link>
             {user?.role === "ADMIN" && (
               <Link
                 href="/usuarios"
@@ -138,15 +149,20 @@ export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
           </nav>
         )}
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           {isLanding ? (
             <>
-              <Link
-                href="/planillas"
-                className="hidden text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline xl:inline"
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden h-9 rounded-full border-azul-300 bg-card px-3 text-azul-700 hover:bg-azul-50 hover:text-azul-700 md:inline-flex"
+                asChild
               >
-                Portal docentes
-              </Link>
+                <Link href="/planillas">
+                  <GraduationCap className="size-4" />
+                  Portal docentes
+                </Link>
+              </Button>
               <Button
                 size="sm"
                 className="hidden h-9 rounded-full bg-whatsapp px-3 text-whatsapp-foreground hover:bg-whatsapp/90 md:inline-flex"
@@ -239,6 +255,13 @@ export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
                       >
                         Boletines
                       </Link>
+                      <Link
+                        href="/avance"
+                        onClick={() => setOpen(false)}
+                        className="rounded-xl px-3 py-3 text-base text-tinta hover:bg-azul-50"
+                      >
+                        Avance
+                      </Link>
                       {user?.role === "ADMIN" && (
                         <Link
                           href="/usuarios"
@@ -271,7 +294,17 @@ export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
                   </div>
                 )}
                 {isLanding && (
-                  <div className="mt-8 space-y-3 border-t border-border pt-6">
+                  <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6">
+                    <Button
+                      variant="outline"
+                      className="h-11 w-full rounded-full border-azul-300 bg-card text-azul-700 hover:bg-azul-50 hover:text-azul-700"
+                      asChild
+                    >
+                      <Link href="/planillas" onClick={() => setOpen(false)}>
+                        <GraduationCap className="size-4" />
+                        Portal docentes
+                      </Link>
+                    </Button>
                     <Button
                       className="w-full rounded-full bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90"
                       asChild
@@ -285,13 +318,6 @@ export const Header = ({ user = null }: { user?: HeaderUser | null }) => {
                         WhatsApp
                       </a>
                     </Button>
-                    <Link
-                      href="/planillas"
-                      onClick={() => setOpen(false)}
-                      className="block text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
-                    >
-                      Portal docentes
-                    </Link>
                   </div>
                 )}
               </SheetContent>
