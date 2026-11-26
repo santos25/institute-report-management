@@ -1,43 +1,38 @@
-import { Award, Clock, MapPin, Users } from "lucide-react";
+import { Award, CalendarDays, IdCard, Users } from "lucide-react";
 import { SITE } from "@/lib/site";
-import { Reveal } from "./reveal";
 
 const items = [
+  { icon: Award, title: SITE.resolutionShort, detail: SITE.resolutionDate },
+  { icon: IdCard, title: "DANE", detail: SITE.dane },
   {
-    icon: Award,
-    label: SITE.resolution,
+    icon: CalendarDays,
+    title: SITE.calendar,
+    detail: "Calendario escolar oficial",
   },
-  {
-    icon: MapPin,
-    label: `${SITE.neighborhood}, ${SITE.city}`,
-  },
-  {
-    icon: Clock,
-    label: SITE.hoursWeekday,
-  },
-  {
-    icon: Users,
-    label: "Grupos reducidos",
-  },
+  { icon: Users, title: "Mixto y privado", detail: "Niños y niñas juntos" },
 ];
 
 export function TrustStrip() {
   return (
-    <section className="px-4 sm:px-6 lg:px-8">
-      <Reveal>
-        <ul className="mx-auto grid max-w-6xl gap-3 rounded-[2rem] bg-azul-600 px-4 py-5 text-white sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
-          {items.map((item) => (
-            <li key={item.label} className="flex items-start gap-3 p-2">
-              <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-white/15">
-                <item.icon className="size-4" aria-hidden />
+    <section
+      aria-label="Datos oficiales"
+      className="bg-azul-500 text-primary-foreground"
+    >
+      <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-6 px-4 pb-12 pt-6 sm:px-6 lg:grid-cols-4 lg:px-8">
+        {items.map((item) => (
+          <li key={item.title} className="flex items-start gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-card/15">
+              <item.icon className="size-5" aria-hidden />
+            </span>
+            <span>
+              <span className="block font-display text-base font-semibold leading-tight sm:text-lg">
+                {item.title}
               </span>
-              <span className="text-sm font-medium leading-snug">
-                {item.label}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </Reveal>
+              <span className="text-sm text-azul-50">{item.detail}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
