@@ -18,9 +18,10 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Instituto Angelitos Alegres | Preescolar en Nuevo Bosque, Cartagena",
+  title:
+    "Instituto Angelitos Alegres | Preescolar y Primaria en Nuevo Bosque, Cartagena",
   description:
-    "Formando el futuro de nuestros niños y niñas con amor, dedicación y excelencia educativa. Preescolar en Nuevo Bosque, Cartagena.",
+    "Formando el futuro de nuestros niños y niñas con amor, dedicación y excelencia educativa. Preescolar y Básica Primaria en Nuevo Bosque, Cartagena.",
   openGraph: {
     title: SITE.name,
     description: SITE.tagline,
