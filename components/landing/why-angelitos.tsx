@@ -1,42 +1,57 @@
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 import { features, toneClasses } from "./content";
 import { Reveal } from "./reveal";
+import { SectionHeading } from "./section-heading";
 
 export function WhyAngelitos() {
   return (
     <section
       id="nosotros"
-      className="scroll-mt-24 px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24"
+      className="bg-sol-50 px-4 py-20 sm:px-6 sm:py-24 lg:px-8"
     >
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="mb-3 font-display text-sm font-semibold uppercase tracking-wider text-azul-600">
-              Por qué Angelitos
+      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+        <Reveal className="relative order-2 lg:order-1">
+          <div className="relative mx-auto aspect-square max-w-md overflow-hidden rounded-[58%_42%_46%_54%/48%_44%_56%_52%] shadow-xl ring-8 ring-card">
+            <Image
+              src="/images/img5.jpg"
+              alt="Estudiantes compartiendo al aire libre"
+              fill
+              sizes="(max-width: 1024px) 90vw, 448px"
+              className="object-cover"
+            />
+          </div>
+          <div className="absolute -bottom-4 right-4 max-w-[15rem] rounded-3xl bg-card p-5 shadow-xl sm:right-10">
+            <p className="font-display text-lg font-semibold leading-snug text-tinta">
+              “Cada niño y niña se siente valorado y protegido.”
             </p>
-            <h2 className="font-display text-3xl font-semibold text-tinta sm:text-4xl">
-              Educación que transforma
-            </h2>
-            <p className="mt-4 text-lg leading-relaxed text-tinta-600">
-              Creamos experiencias de aprendizaje únicas que inspiran a nuestros
-              niños y niñas a explorar, crear y crecer en un ambiente lleno de
-              amor y dedicación.
+            <p className="mt-2 text-xs font-bold uppercase tracking-wider text-coral-700">
+              Nuestro compromiso
             </p>
           </div>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            const tone = toneClasses[feature.tone];
-            return (
+        <div className="order-1 lg:order-2">
+          <Reveal>
+            <SectionHeading
+              eyebrow="Por qué elegirnos"
+              title="Educación que abraza, inspira y acompaña"
+              align="left"
+            />
+          </Reveal>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            {features.map((feature, index) => (
               <Reveal key={feature.title} delay={index * 80}>
-                <article className="group h-full rounded-[1.75rem] border border-border bg-card p-6 shadow-sm motion-safe:transition-all motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lg">
-                  <div
-                    className={`mb-5 flex size-14 items-center justify-center rounded-2xl ${tone.icon} motion-safe:transition-transform motion-safe:group-hover:rotate-3`}
+                <article className="h-full rounded-3xl bg-card p-6 shadow-sm ring-1 ring-sol-200">
+                  <span
+                    className={cn(
+                      "flex size-12 items-center justify-center rounded-2xl",
+                      toneClasses[feature.tone].icon
+                    )}
                   >
-                    <Icon className="size-7" aria-hidden />
-                  </div>
-                  <h3 className="font-display text-xl font-semibold text-tinta">
+                    <feature.icon className="size-6" aria-hidden />
+                  </span>
+                  <h3 className="mt-4 font-display text-xl font-semibold text-tinta">
                     {feature.title}
                   </h3>
                   <p className="mt-2 leading-relaxed text-tinta-600">
@@ -44,8 +59,8 @@ export function WhyAngelitos() {
                   </p>
                 </article>
               </Reveal>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
     </section>

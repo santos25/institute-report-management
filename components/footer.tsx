@@ -1,36 +1,54 @@
+import Image from "next/image";
 import Link from "next/link";
-import { SITE } from "@/lib/site";
+import { getWhatsAppUrl, SITE } from "@/lib/site";
+import { WhatsAppIcon } from "@/components/landing/whatsapp-icon";
 
-const LINKS = [
-  { label: "Nosotros", href: "#nosotros" },
-  { label: "Grados", href: "#grados" },
-  { label: "Un día con nosotros", href: "#un-dia" },
+const SECTION_LINKS = [
+  { label: "Niveles", href: "#niveles" },
+  { label: "Por qué elegirnos", href: "#nosotros" },
   { label: "Galería", href: "#galeria" },
-  { label: "Admisiones", href: "#admisiones" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Admisión", href: "#admision" },
+  { label: "Preguntas frecuentes", href: "#preguntas" },
+  { label: "Ubicación", href: "#ubicacion" },
 ];
+
+const ACCESS_LINKS = [
+  { label: "Portal familias", href: SITE.familiesPortalPath },
+  { label: "Ingreso docentes", href: SITE.teachersLoginPath },
+];
+
+const headingClass =
+  "font-display text-sm font-semibold uppercase tracking-wider text-sol-400";
+const linkClass = "text-sm text-tinta-200 hover:text-crema-100 hover:underline";
 
 export const Footer = () => {
   return (
-    <footer className="bg-tinta-800 text-crema-100">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3 lg:px-8">
-        <div className="md:col-span-1">
-          <h2 className="font-display text-xl font-semibold">{SITE.name}</h2>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-tinta-300">
-            {SITE.tagline}
+    <footer className="bg-tinta-800 pb-28 text-crema-100 md:pb-0">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-8">
+        <div>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={48}
+              height={48}
+              className="size-12 rounded-full bg-card object-contain p-0.5"
+            />
+            <h2 className="font-display text-xl font-semibold">{SITE.name}</h2>
+          </div>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-tinta-200">
+            {SITE.tagline}.
+          </p>
+          <p className="mt-4 text-sm text-tinta-200">
+            {SITE.resolution} · DANE {SITE.dane}
           </p>
         </div>
         <div>
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-sol-400">
-            Enlaces
-          </h3>
+          <h3 className={headingClass}>Secciones</h3>
           <ul className="mt-4 space-y-2">
-            {LINKS.map((link) => (
+            {SECTION_LINKS.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm text-tinta-300 hover:text-crema-100 hover:underline"
-                >
+                <Link href={link.href} className={linkClass}>
                   {link.label}
                 </Link>
               </li>
@@ -38,37 +56,40 @@ export const Footer = () => {
           </ul>
         </div>
         <div>
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-sol-400">
-            Horarios
-          </h3>
-          <ul className="mt-4 space-y-2 text-sm text-tinta-300">
-            <li>{SITE.hoursWeekday}</li>
-            <li>{SITE.hoursSaturday}</li>
-            <li>{SITE.hoursSunday}</li>
+          <h3 className={headingClass}>Accesos</h3>
+          <ul className="mt-4 space-y-2">
+            {ACCESS_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className={linkClass}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
-          <p className="mt-4 text-sm text-tinta-300">{SITE.addressFull}</p>
-          <p className="mt-1 text-sm">
-            <a
-              href={`tel:${SITE.phoneTel}`}
-              className="hover:text-crema-100 hover:underline"
-            >
-              {SITE.phoneDisplay}
-            </a>
+          <p className="mt-6 text-sm text-tinta-200">
+            Preescolar y Básica Primaria
+            <br />
+            {SITE.calendar} · Mixto y privado
           </p>
-          <p className="mt-1 text-sm">
-            <a
-              href={`mailto:${SITE.email}`}
-              className="hover:text-crema-100 hover:underline"
-            >
-              {SITE.email}
-            </a>
+        </div>
+        <div>
+          <h3 className={headingClass}>Contacto</h3>
+          <p className="mt-4 text-sm leading-relaxed text-tinta-200">
+            {SITE.address}
           </p>
-          {/* TODO: Añadir Instagram y Facebook cuando el propietario confirme las URLs oficiales. */}
+          <a
+            href={getWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-crema-100 hover:underline"
+          >
+            <WhatsAppIcon className="size-4 text-whatsapp" />
+            {SITE.whatsappDisplay}
+          </a>
         </div>
       </div>
-      <div className="border-t border-tinta-600 py-6 text-center text-sm text-tinta-400">
-        © {new Date().getFullYear()} {SITE.name}. Todos los derechos
-        reservados.
+      <div className="border-t border-tinta-600 px-4 py-6 text-center text-sm text-tinta-300">
+        © {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.
       </div>
     </footer>
   );
